@@ -1,0 +1,957 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Introduction aux méthodes quantitatives avec R</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="J. Migozzi" />
+    <meta name="date" content="2020-09-30" />
+    <link href="libs/remark-css/default.css" rel="stylesheet" />
+    <link href="libs/remark-css/default-fonts.css" rel="stylesheet" />
+    <script src="libs/kePrint/kePrint.js"></script>
+    <link href="libs/lightable/lightable.css" rel="stylesheet" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Introduction aux méthodes quantitatives avec R
+## statistique et cartographie
+### J. Migozzi
+### Ecole Normale Supérieure
+### 2020-09-30
+
+---
+
+class: inverse, center, middle
+
+
+
+
+
+
+# Géographie : un tournant numérique ?
+
+---
+
+
+# Un monde de données
+
+- Toujours plus de données (spatiales) 
+
+  - des données statistiques : INSEE, UE, communes... 
+  - des données picturales : images satellites, photographies aériennes... ;
+  - des données textuelles : articles de presse, débats parlementaires, textes législatifs... ;
+
+--
+
+- De nouvelles sources de données numériques
+  - réseaux sociaux : Facebook, Twitter, Instagram
+  - plateformes : Uber, LeBonCoin, Yelp, Google Maps...
+
+
+
+---
+
+# Des sciences sociales : un tournant numérique 
+
+- Le développement des Humanités Numériques transforme les champs scientifiques et professionnels
+
+- Roth, Camille. 2019. “[Digital, Digitized, and Numerical Humanities.](https://academic.oup.com/dsh/article-abstract/34/3/616/5161109)” _Digital Scholarship in the Humanities_ 
+
+---
+
+# Des sciences sociales : un tournant numérique 
+
+_Computational Social Science_ &amp; _Digital Trace Data_
+
+&lt;blockquote&gt;
+We live life in the network. We check our e-mails regularly, make mobile phone calls from almost any location, swipe transit cards to use public transportation,and  make  purchases  with  credit cards. Our movements in public places may be captured by video cameras, and our medical records stored as digital files. We may post blog entries accessible to anyone, or maintain friendships through online social networks. Each of these transactions leaves digital traces that can be compiled into comprehensive pictures of both individual and group behavior, with the potential to transform our understanding of our lives, organizations, and societies.
+.right[-- &lt;cite&gt;D. Lazer, 2009, _Science_&lt;/cite&gt;]
+&lt;/blockquote&gt;
+
+---
+
+
+# La géographie quantitative
+
+Compter, classer, mesurer, modéliser : geste quantitatif au coeur de la géographie
+
+--
+- cartographie
+- analyse spatiale
+
+--
+
+### Années 1950-1960 : révolution quantitative
+
+--
+- Recherche de lois générales dans l'organisation de l'espace
+- Essor de la _regional science_, de l'économétrie spatiale
+- Modélisation : réseaux de transport, systèmes urbains etc.
+
+--
+
+### Années 2010 : tournant "digital" de la géographie quantitative
+
+- Nouveaux jeux de données avec numérisation des sociétés  
+- Rencontre avec d'autres sciences : Data Science, CSS 
+- Vers la "Spatial Data science" ou "Geographical Data Science" ?
+- Arribas-Bel, D, 2018. “[Geography and Computers: Past, Present, and Future](https://onlinelibrary.wiley.com/doi/abs/10.1111/gec3.12403)” _Geography Compass_.
+
+---
+class: inverse, center, middle
+
+# Le logiciel R
+
+---
+
+# Un logiciel couteau-suisse
+
+- R est un langage de programmation.
+
+- Un très large panel d'outils pour les sciences sociales
+  - visualisation de données ( _data viz_) ;
+  - statistiques ;
+  - cartographie ;
+  - SIG ;
+  - _machine learning_ ;
+  - analyse de réseaux ;
+  - analyse textuelle ; 
+  - présentation visuelle ; 
+  - rédaction de mémoires, de rapports...
+
+--
+
+- Un pont vers les autres disciplines : sociologie, économie, sciences politiques _etc_.
+
+---
+
+# Un outil tout-en-un
+
+&lt;img src="img/data-science-workflow.png" width="90%" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Un garant de reproductibilité 
+
+- Si vous travaillez sur R, n'importe qui peut reproduire votre travail = transparence
+
+--
+
+- Suppression des fichiers intermédiaires (texte, figure, mise en page) = gain de temps.
+
+--
+
+- Générer à volonté des analyses assorties de visualisations claires = diffusion.
+
+
+
+---
+
+# Une communauté d'utilisateurs
+
+- Un logiciel open source : gratuit, collaboratif 
+
+- Très large bibliothèque de *packages* disponible sur le *The Comprehensive R Archive Network* (CRAN).
+
+- Des ressources en ligne :
+  - [Introduction à R et au *tidyverse*](https://juba.github.io/tidyverse/index.html), de Julien Barnier
+  - [Geocomputation with R](https://geocompr.robinlovelace.net/), de Lovelace, Nowosad et Muenchow
+  - [R et Espace](https://framabook.org/r-et-espace/)
+  - [R for Data Science](https://r4ds.had.co.nz/l), de Garrett Grolemund et Hadley Wickham
+  - [Data Visualization : A practical introduction](https://socviz.co/), de Kieran Healy
+  - [Bit by Bit: Social Research in the Digital Age](https://www.bitbybitbook.com/), de Matthew Salganik 
+  
+  
+
+
+---
+
+# Les objectifs de ce cours
+
+
+1. Formation aux méthodes et normes de la statistique et de la cartographie
+
+1. Formation à la _pratique_ du code et à l'environnement RStudio
+
+---
+class: inverse, center, middle
+
+# Les statistiques : éléments généraux de définition
+
+---
+
+# Eléments de définition
+
+- des données numériques, collectées par une institution publique/privée, ou par vous même...
+
+
+- des méthodes mathématiques, où on peut distinguer deux branches : 
+
+--
+
+    - la _statistique descriptive_ : résumer l'information sur un ensemble d'éléments
+    - la _statistique inférentielle_ : généraliser à de grands ensembles d'éléments des résultats obtenus sur un  échantillon. 
+
+
+
+---
+
+# L'information géographique
+
+&lt;blockquote&gt;
+Une information est dite géographique lorsqu'elle se rapporte à un ou plusieurs lieux de la surface terrestre. C'est une information localisée et repérée, ou encore "géocodée"
+.right[-- &lt;cite&gt;Béguin &amp; Pumain, 2010&lt;/cite&gt;]
+&lt;/blockquote&gt;
+
+
+---
+
+# Les notions fondamentales
+
+### Vocabulaire
+
+- Population : l'ensemble des éléments (unité statistiques, individus)
+- Individu : tout élement de la population (élement)
+- Effectif : efectif total d'une population ou d'un échantillon
+
+### Conventions d'écriture
+
+- _N_ : le nombre d'individus (ex : _n_ =25)
+- i : indice qui sert à répérer un individu
+
+
+--
+
+### Décrire les données
+
+- **Variable** : propriété commune à tous les individus
+- **Modalité** : valeur possible pris par une variable
+
+---
+
+## Les types de variable : 2 groupes principaux
+
+&lt;img src="img/Variable.PNG" width="80%" style="display: block; margin: auto;" /&gt;
+
+
+
+---
+# La structure des données 
+
+## Le tableau élémentaire
+
+- Un tableau qui décrit un ensemble d'individus à l'aide d'un ensemble de variables ;
+- Les lignes correspondent aux individus ;
+- Les colonnes aux variables ; 
+- La première colonne est généralement réservé à un **identifiant**.
+
+---
+class: middle, center
+
+# Exercice 
+
+Décrivez le tableau suivant :
+
+&lt;table class="table table-striped" style="font-size: 16px; margin-left: auto; margin-right: auto;"&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt; Pays &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Continent &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Annee &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Esperancedevie &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Population &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; PIBparhabitant &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Trinidad and Tobago &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Americas &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2007 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 69.819 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1056608 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 18008.5092 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Sweden &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Europe &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2007 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 80.884 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 9031088 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 33859.7484 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Rwanda &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Africa &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2007 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 46.242 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 8860588 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 863.0885 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Slovenia &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Europe &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2007 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 77.926 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2009245 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 25768.2576 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Austria &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Europe &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2007 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 79.829 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 8199783 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 36126.4927 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Chile &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Americas &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2007 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 78.553 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 16284741 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 13171.6388 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Japan &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Asia &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2007 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 82.603 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 127467972 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 31656.0681 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Namibia &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Africa &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2007 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 52.906 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2055080 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 4811.0604 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Guatemala &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Americas &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2007 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 70.259 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 12572928 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 5186.0500 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Angola &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Africa &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2007 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 42.731 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 12420476 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 4797.2313 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;tfoot&gt;&lt;tr&gt;&lt;td style="padding: 0; border: 0;" colspan="100%"&gt;
+&lt;span style="font-style: italic;"&gt;Source : &lt;/span&gt; &lt;sup&gt;&lt;/sup&gt; Gapminder&lt;/td&gt;&lt;/tr&gt;&lt;/tfoot&gt;
+&lt;/table&gt;
+
+
+---
+class: inverse, center, middle
+
+# Prise en main de RStudio
+
+---
+
+### Téléchargez R et RStudio 
+
+- Aller sur Google et cherchez "télécharger R"
+- Puis faites de même pour RStudio
+
+--
+
+### Démarrer RStudio depuis le bureau
+
+&lt;img src="img/50318_1516370386_scr.jpg" width="75%" style="display: block; margin: auto;" /&gt;
+
+---
+## La console : une grosse calculette
+
+- Additioner/Multiplier/Diviser 5 et 4 ; 
+- Utiliser la touche `Entrée` pour valider la commande
+
+---
+
+# Structure de R 
+
+&lt;blockquote&gt;
+Everything that exists is an object.  
+     Everything that happens is a function call. 
+.right[-- &lt;cite&gt;John Chambers&lt;/cite&gt;]
+&lt;/blockquote&gt;
+
+## Les différents types de données 
+
+- **numeric** : valeurs décimale (10.1)
+- **integer** : nombre entier (10)
+- **logical** : valeurs booléennes (TRUE, FALSE)
+- **characters** : du texte (aussi appelé *string*). Pour déclarer une donnée de type texte, il faut utiliser les "quotation marks"
+
+---
+
+## L'opérateur d'assignation : `&lt;-` 
+
+Création d'un objet x de type numérique
+
+```r
+x &lt;- 12
+# Quel type d'objet ?
+class(x)
+```
+
+```
+## [1] "numeric"
+```
+
+```r
+#Exécution
+x
+```
+
+```
+## [1] 12
+```
+
+---
+## L'opérateur d'assignation : `&lt;-` 
+
+Création d'un objet y de type **character**
+
+```r
+y &lt;- "Bob"
+# Quel type d'objet ?
+class(y)
+```
+
+```
+## [1] "character"
+```
+
+```r
+#Exécution
+y
+```
+
+```
+## [1] "Bob"
+```
+
+---
+# Le vecteur
+
+Un vecteur est une liste d'éléments étant tous du même type.
+
+Création d'un vecteur avec la fonction *c()*: 
+
+
+```r
+monVecteur &lt;- c(objet1, objet2, objet3)
+```
+
+On peut accéder aux éléments d'un vecteur en utilisant le signe [ ]. 
+
+
+```r
+x &lt;- c(10, 1000, 200) 
+x[3]
+```
+
+```
+## [1] 200
+```
+
+Une opération menée sur un vecteur s'applique à tous ses éléments : 
+
+```r
+x/10
+```
+
+```
+## [1]   1 100  20
+```
+
+---
+# Exercice
+
+- Stockez dans un vecteur `distance` les valeurs suivantes exprimées en mètres : 
+
+
+```r
+57069 , 91629 , 54953 , 46444,53158 ,22099 ,14570, 55856
+```
+
+
+- Créez un nouveau vecteur  `distance.km` qui stocke ces distances en kilomètres
+- Stockez la 4e valeur du vecteur `distance` dans un nouvel objet `distance.4`
+- Remplacez la 4e valeur du vecteur `distance` par la valeur `12`
+- Assignez une valeur manquante à la 2e valeur du vecteur `distance` (NA)
+
+---
+# Solution 
+
+- Stockez dans un vecteur `distance` les valeurs suivantes exprimées en mètres : 
+
+
+```r
+distance &lt;- c(57069 , 91629 , 54953 , 46444,53158 ,22099 ,14570, 55856)
+```
+- Créez un nouveau vecteur  `distance.km` qui stocke ces distances en kilomètres
+
+```r
+distance.km &lt;- distance/1000
+```
+- Remplacez la 4e valeur du vecteur `distance` par la valeur `12`
+
+```r
+distance[4] &lt;- 12
+```
+- Assignez une valeur manquante à la 2e valeur du vecteur `distance` (NA)
+
+```r
+distance &lt;- NA
+```
+
+---
+
+# Le tableau élémentaire
+
+C'est un ensemble de vecteurs !
+
+&lt;table class="table table-striped" style="font-size: 16px; width: auto !important; margin-left: auto; margin-right: auto;"&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt; Pays &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Continent &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Annee &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Esperancedevie &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Population &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; PIBparhabitant &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Mali &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Africa &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2007 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 54.467 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 12031795 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1042.5816 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Zambia &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Africa &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2007 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 42.384 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 11746035 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1271.2116 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Iraq &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Asia &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2007 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 59.545 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 27499638 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 4471.0619 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Zimbabwe &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Africa &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2007 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 43.487 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 12311143 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 469.7093 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Mexico &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Americas &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2007 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 76.195 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 108700891 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 11977.5750 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Cote d'Ivoire &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Africa &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2007 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 48.328 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 18013409 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1544.7501 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; India &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Asia &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2007 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 64.698 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1110396331 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2452.2104 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Togo &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Africa &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2007 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 58.420 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 5701579 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 882.9699 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Pakistan &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Asia &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2007 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 65.483 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 169270617 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2605.9476 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Eritrea &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Africa &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2007 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 58.040 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 4906585 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 641.3695 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;tfoot&gt;&lt;tr&gt;&lt;td style="padding: 0; border: 0;" colspan="100%"&gt;
+&lt;span style="font-style: italic;"&gt;Source : &lt;/span&gt; &lt;sup&gt;&lt;/sup&gt; Gapminder&lt;/td&gt;&lt;/tr&gt;&lt;/tfoot&gt;
+&lt;/table&gt;
+
+---
+
+# **Le data.frame**
+
+Création d'un data.frame avec la fonction `data.frame()`
+
+
+```r
+# 3 vecteurs
+ville &lt;- c("Rome", "Paris", "Londres")  #création vecteur
+population &lt;- c(2873000, 2141000, 8136000)
+etat &lt;- c("Italie", "France", "Royaume-Uni")
+# 1 data.frame
+df &lt;- data.frame(ville, population, etat, 
+                 stringsAsFactors = F) #création 
+df
+```
+
+```
+##     ville population        etat
+## 1    Rome    2873000      Italie
+## 2   Paris    2141000      France
+## 3 Londres    8136000 Royaume-Uni
+```
+
+---
+
+## Dimensions d'un data.frame
+
+
+```r
+class(df) #classe de l'objet
+```
+
+```
+## [1] "data.frame"
+```
+
+```r
+dim(df) #dimension
+```
+
+```
+## [1] 3 3
+```
+
+```r
+nrow(df)#nombre de lignes
+```
+
+```
+## [1] 3
+```
+
+```r
+ncol(df) #nombres de colonnes
+```
+
+```
+## [1] 3
+```
+---
+
+## Manipulation  d'un data.frame
+
+- Accès à une colonne avec le signe $ + TAB pour afficher les colonnes disponibles
+
+
+```r
+df$population
+```
+
+```
+## [1] 2873000 2141000 8136000
+```
+
+- Création d'une colonne 
+
+
+```r
+df$PopMillier &lt;- df$population/1000
+df$PopMillier
+```
+
+```
+## [1] 2873 2141 8136
+```
+
+```r
+df$Type &lt;- "Capitale"
+df$Type
+```
+
+```
+## [1] "Capitale" "Capitale" "Capitale"
+```
+
+---
+
+## Importer des données dans R
+
+- Un fichier au format csv (le plus courant) :
+
+
+```r
+df &lt;-  read_csv(file="c:/MonTableau.csv", header=TRUE, sep=",")
+```
+
+- Un fichier au format excel :
+
+
+```r
+df &lt;- read_excel(path = "c:/MonTableau.xlsx", sheet = 1, col_names = TRUE)
+```
+
+- Voir par exemple [Import de données dans RStudio](http://larmarange.github.io/analyse-R/import-de-donnees.html)
+
+---
+# Les fonctions
+
+- Une fonction a un **nom**, elle prend en entrée des **arguments** (ou paramètres) et des objets en _input_, et retourne un résultat (ou _output_)
+
+- On peut stocker le résulat d'une fonction dans un objet :
+
+
+```r
+nouvelObjet &lt;- function(objet, paramètres)
+```
+
+- Souvent, les fonctions prennent le nom d'un verbe en anglais. Par exemple, la fonction `length` renvoie le nombre d'élements d'un vecteur :
+
+
+```r
+length(distance)
+```
+
+---
+# Exercice
+
+
+- Avec le vecteur `distance.km`, calculez la distance minimale, la distance maximale et la distance moyenne
+
+- Avec le vecteur `distance`, calculer la moyenne.
+
+
+---
+# Solution
+
+
+- Avec le vecteur `distance.km`, calculez la distance minimale, la distance maximale et la distance moyenne
+
+
+```r
+min(distance.km)
+max(distance.km)
+mean(distance.km)
+```
+
+- Si je veux stocker le résultat de ce calcul, il faut utiliser "&lt;-" !
+
+```r
+distanc.min &lt;- min(distance.km)
+```
+
+- Avec le vecteur `distance`, calculer la moyenne.
+
+```r
+mean(distance) #renvoie une valeur NA
+```
+- Il faut donc spécifier un argument pour enlever les valeurs manquantes lors du calcul
+
+```r
+mean(distance na.rm = T) # = na.remove = TRUE
+```
+---
+
+## Le script
+
+### Une partition 
+
+- Un fichier texte qui regroupe l'ensemble des commandes à exécuter
+- Utilité : garder trace de tout ce que l'on effectué. 
+- Script : garant de la reproductibiliité. 
+- Créer un script : sélectionner le menu `File`, puis `New file` et `R script`
+
+
+### Le script : les bonnes pratiques
+
+- Enregistrer ses scripts au format UTF-8
+- Donner des noms clairs à ses scripts
+- Utiliser le caractère # pour commenter son script
+- Proposer un en-tête
+- Annoter le plus possible
+- Constituer des sections internes en utilisant 4 fois le signe "-" : "----"
+- Principe : le script doit être clair et pouvoir être éxecuté d'un seul tenant
+
+---
+
+# Exercice
+
+- Envoyer *avant* samedi 3 octobre un script au format "NOM_Prenom_Intro.R" qui : 
+  - Ouvre le fichier csv `murders`. 
+  - Calcul avec une fonction le nombre total de meurtres aux Etats-Unis.
+  - Identifie l'Etat le plus meurtrier et le moins meurtrier.
+- Chacune des étapes doit être commentée (en utilisant le signe #)
+
+---
+
+class: center, middle
+
+# Merci !
+
+Slides crées avec le package [**xaringan**](https://github.com/yihui/xaringan).
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
