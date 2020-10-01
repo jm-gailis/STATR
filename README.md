@@ -8,7 +8,7 @@ Ce cours est créé par Julien Migozzi, AGPR à l'Ecole Normale Supérieure, pou
 
 ## Remerciements
 
-Certains des matériaux de ce cours ont été adaptées ou inspirées de plusieurs sources, et notamment : 
+Certains des matériaux de ce cours ont été adaptés ou inspirés de plusieurs sources, et notamment : 
 
 * [Les cours de Claude Grasland](http://grasland.script.univ-paris-diderot.fr/).
 * [Introduction à R et au tidyverse](https://juba.github.io/tidyverse/) de Julien Barnier.
