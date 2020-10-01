@@ -568,7 +568,7 @@ mean(distance na.rm = T) # = na.remove = TRUE
 
 - Envoyer *avant* samedi 3 octobre un script au format "NOM_Prenom_Intro.R" qui : 
   - Ouvre le fichier csv `murders`. 
-  - Calcul avec une fonction le nombre total de meurtres aux Etats-Unis.
+  - Calcule avec une fonction le nombre total de meurtres aux Etats-Unis.
   - Identifie l'Etat le plus meurtrier et le moins meurtrier.
 - Chacune des étapes doit être commentée (en utilisant le signe #)
 
