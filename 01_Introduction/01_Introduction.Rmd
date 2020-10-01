@@ -3,7 +3,7 @@ title: "Introduction aux méthodes quantitatives avec R"
 subtitle: "statistique et cartographie"
 author: "J. Migozzi"
 institute: "Ecole Normale Supérieure"
-date: "`r Sys.Date()`"
+date: "28/09/2020"
 output:
   xaringan::moon_reader:
     #yolo: true

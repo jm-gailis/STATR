@@ -4,7 +4,6 @@
     <title>Introduction aux méthodes quantitatives avec R</title>
     <meta charset="utf-8" />
     <meta name="author" content="J. Migozzi" />
-    <meta name="date" content="2020-09-30" />
     <link href="libs/remark-css/default.css" rel="stylesheet" />
     <link href="libs/remark-css/default-fonts.css" rel="stylesheet" />
     <script src="libs/kePrint/kePrint.js"></script>
@@ -18,7 +17,7 @@ class: center, middle, inverse, title-slide
 ## statistique et cartographie
 ### J. Migozzi
 ### Ecole Normale Supérieure
-### 2020-09-30
+### 28/09/2020
 
 ---
 
@@ -266,22 +265,6 @@ Décrivez le tableau suivant :
  &lt;/thead&gt;
 &lt;tbody&gt;
   &lt;tr&gt;
-   &lt;td style="text-align:left;"&gt; Trinidad and Tobago &lt;/td&gt;
-   &lt;td style="text-align:left;"&gt; Americas &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 2007 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 69.819 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 1056608 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 18008.5092 &lt;/td&gt;
-  &lt;/tr&gt;
-  &lt;tr&gt;
-   &lt;td style="text-align:left;"&gt; Sweden &lt;/td&gt;
-   &lt;td style="text-align:left;"&gt; Europe &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 2007 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 80.884 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 9031088 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 33859.7484 &lt;/td&gt;
-  &lt;/tr&gt;
-  &lt;tr&gt;
    &lt;td style="text-align:left;"&gt; Rwanda &lt;/td&gt;
    &lt;td style="text-align:left;"&gt; Africa &lt;/td&gt;
    &lt;td style="text-align:right;"&gt; 2007 &lt;/td&gt;
@@ -290,44 +273,12 @@ Décrivez le tableau suivant :
    &lt;td style="text-align:right;"&gt; 863.0885 &lt;/td&gt;
   &lt;/tr&gt;
   &lt;tr&gt;
-   &lt;td style="text-align:left;"&gt; Slovenia &lt;/td&gt;
-   &lt;td style="text-align:left;"&gt; Europe &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 2007 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 77.926 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 2009245 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 25768.2576 &lt;/td&gt;
-  &lt;/tr&gt;
-  &lt;tr&gt;
-   &lt;td style="text-align:left;"&gt; Austria &lt;/td&gt;
-   &lt;td style="text-align:left;"&gt; Europe &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 2007 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 79.829 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 8199783 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 36126.4927 &lt;/td&gt;
-  &lt;/tr&gt;
-  &lt;tr&gt;
-   &lt;td style="text-align:left;"&gt; Chile &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Venezuela &lt;/td&gt;
    &lt;td style="text-align:left;"&gt; Americas &lt;/td&gt;
    &lt;td style="text-align:right;"&gt; 2007 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 78.553 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 16284741 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 13171.6388 &lt;/td&gt;
-  &lt;/tr&gt;
-  &lt;tr&gt;
-   &lt;td style="text-align:left;"&gt; Japan &lt;/td&gt;
-   &lt;td style="text-align:left;"&gt; Asia &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 2007 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 82.603 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 127467972 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 31656.0681 &lt;/td&gt;
-  &lt;/tr&gt;
-  &lt;tr&gt;
-   &lt;td style="text-align:left;"&gt; Namibia &lt;/td&gt;
-   &lt;td style="text-align:left;"&gt; Africa &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 2007 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 52.906 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 2055080 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 4811.0604 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 73.747 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 26084662 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 11415.8057 &lt;/td&gt;
   &lt;/tr&gt;
   &lt;tr&gt;
    &lt;td style="text-align:left;"&gt; Guatemala &lt;/td&gt;
@@ -338,12 +289,60 @@ Décrivez le tableau suivant :
    &lt;td style="text-align:right;"&gt; 5186.0500 &lt;/td&gt;
   &lt;/tr&gt;
   &lt;tr&gt;
-   &lt;td style="text-align:left;"&gt; Angola &lt;/td&gt;
-   &lt;td style="text-align:left;"&gt; Africa &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Bahrain &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Asia &lt;/td&gt;
    &lt;td style="text-align:right;"&gt; 2007 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 42.731 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 12420476 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 4797.2313 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 75.635 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 708573 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 29796.0483 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Hong Kong, China &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Asia &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2007 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 82.208 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6980412 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 39724.9787 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Puerto Rico &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Americas &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2007 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 78.746 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3942491 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 19328.7090 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Philippines &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Asia &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2007 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 71.688 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 91077287 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3190.4810 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Israel &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Asia &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2007 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 80.745 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6426679 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 25523.2771 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Panama &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Americas &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2007 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 75.537 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3242173 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 9809.1856 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Germany &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Europe &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2007 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 79.406 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 82400996 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 32170.3744 &lt;/td&gt;
   &lt;/tr&gt;
 &lt;/tbody&gt;
 &lt;tfoot&gt;&lt;tr&gt;&lt;td style="padding: 0; border: 0;" colspan="100%"&gt;
@@ -535,60 +534,36 @@ C'est un ensemble de vecteurs !
  &lt;/thead&gt;
 &lt;tbody&gt;
   &lt;tr&gt;
-   &lt;td style="text-align:left;"&gt; Mali &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Tanzania &lt;/td&gt;
    &lt;td style="text-align:left;"&gt; Africa &lt;/td&gt;
    &lt;td style="text-align:right;"&gt; 2007 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 54.467 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 12031795 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 1042.5816 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 52.517 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 38139640 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1107.4822 &lt;/td&gt;
   &lt;/tr&gt;
   &lt;tr&gt;
-   &lt;td style="text-align:left;"&gt; Zambia &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Morocco &lt;/td&gt;
    &lt;td style="text-align:left;"&gt; Africa &lt;/td&gt;
    &lt;td style="text-align:right;"&gt; 2007 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 42.384 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 11746035 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 1271.2116 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 71.164 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 33757175 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3820.1752 &lt;/td&gt;
   &lt;/tr&gt;
   &lt;tr&gt;
-   &lt;td style="text-align:left;"&gt; Iraq &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Botswana &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Africa &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2007 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 50.728 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1639131 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 12569.8518 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Jordan &lt;/td&gt;
    &lt;td style="text-align:left;"&gt; Asia &lt;/td&gt;
    &lt;td style="text-align:right;"&gt; 2007 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 59.545 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 27499638 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 4471.0619 &lt;/td&gt;
-  &lt;/tr&gt;
-  &lt;tr&gt;
-   &lt;td style="text-align:left;"&gt; Zimbabwe &lt;/td&gt;
-   &lt;td style="text-align:left;"&gt; Africa &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 2007 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 43.487 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 12311143 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 469.7093 &lt;/td&gt;
-  &lt;/tr&gt;
-  &lt;tr&gt;
-   &lt;td style="text-align:left;"&gt; Mexico &lt;/td&gt;
-   &lt;td style="text-align:left;"&gt; Americas &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 2007 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 76.195 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 108700891 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 11977.5750 &lt;/td&gt;
-  &lt;/tr&gt;
-  &lt;tr&gt;
-   &lt;td style="text-align:left;"&gt; Cote d'Ivoire &lt;/td&gt;
-   &lt;td style="text-align:left;"&gt; Africa &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 2007 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 48.328 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 18013409 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 1544.7501 &lt;/td&gt;
-  &lt;/tr&gt;
-  &lt;tr&gt;
-   &lt;td style="text-align:left;"&gt; India &lt;/td&gt;
-   &lt;td style="text-align:left;"&gt; Asia &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 2007 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 64.698 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 1110396331 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 2452.2104 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 72.535 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6053193 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 4519.4612 &lt;/td&gt;
   &lt;/tr&gt;
   &lt;tr&gt;
    &lt;td style="text-align:left;"&gt; Togo &lt;/td&gt;
@@ -599,20 +574,44 @@ C'est un ensemble de vecteurs !
    &lt;td style="text-align:right;"&gt; 882.9699 &lt;/td&gt;
   &lt;/tr&gt;
   &lt;tr&gt;
-   &lt;td style="text-align:left;"&gt; Pakistan &lt;/td&gt;
-   &lt;td style="text-align:left;"&gt; Asia &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Belgium &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Europe &lt;/td&gt;
    &lt;td style="text-align:right;"&gt; 2007 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 65.483 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 169270617 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 2605.9476 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 79.441 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 10392226 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 33692.6051 &lt;/td&gt;
   &lt;/tr&gt;
   &lt;tr&gt;
-   &lt;td style="text-align:left;"&gt; Eritrea &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Cameroon &lt;/td&gt;
    &lt;td style="text-align:left;"&gt; Africa &lt;/td&gt;
    &lt;td style="text-align:right;"&gt; 2007 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 58.040 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 4906585 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 641.3695 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 50.430 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 17696293 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2042.0952 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Iran &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Asia &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2007 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 70.964 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 69453570 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 11605.7145 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Portugal &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Europe &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2007 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 78.098 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 10642836 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 20509.6478 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Lesotho &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Africa &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2007 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 42.592 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2012649 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1569.3314 &lt;/td&gt;
   &lt;/tr&gt;
 &lt;/tbody&gt;
 &lt;tfoot&gt;&lt;tr&gt;&lt;td style="padding: 0; border: 0;" colspan="100%"&gt;
@@ -821,7 +820,7 @@ mean(distance na.rm = T) # = na.remove = TRUE
 
 - Envoyer *avant* samedi 3 octobre un script au format "NOM_Prenom_Intro.R" qui : 
   - Ouvre le fichier csv `murders`. 
-  - Calcul avec une fonction le nombre total de meurtres aux Etats-Unis.
+  - Calcule avec une fonction le nombre total de meurtres aux Etats-Unis.
   - Identifie l'Etat le plus meurtrier et le moins meurtrier.
 - Chacune des étapes doit être commentée (en utilisant le signe #)
 
