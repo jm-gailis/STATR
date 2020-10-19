@@ -22,9 +22,7 @@ library(sf)
 
 
 
-
-
-movies_paris <- st_read(dsn = "statsmappingwithR/02_SpatialData/data/lieux-de-tournage-a-paris/lieux-de-tournage-a-paris.shp", 
+movies_paris <- st_read(dsn = "data/lieux-de-tournage-a-paris/lieux-de-tournage-a-paris.shp", 
                         crs = 4326, 
                         stringsAsFactors = F)
 
@@ -40,7 +38,7 @@ head(test)
 
 table(movies_paris$type_tourna)
 
-test2 <-  movies_paris %>% filter(nom_tournag == "120 BATTEMENTS PAR MINUTE") 
+test2 <-  movies_paris %>% filter(grepl("ENGRE", nom_tournag))
 mapview(test2)
 table(test2$ardt_lieu)
-table(movies_paris$nom_tournag)
+sort(table(movies_paris$nom_tournag))

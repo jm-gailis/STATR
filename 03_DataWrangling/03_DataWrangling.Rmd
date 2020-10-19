@@ -1,5 +1,5 @@
 ---
-title: "Manipuler des données spatiales"
+title: "Enrichir et manipuler des données spatiales"
 subtitle: "Statistique et cartographie avec R"
 author: "J. Migozzi"
 institute: "Ecole Normale Supérieure"
@@ -24,17 +24,25 @@ class: inverse, center, middle
 ---
 # Rappel
 
-- Pour éxecuter une ligne de code, il suffit de placer le curseur sur une partie de celle-ici, puis CRTL+ENTREE ; 
-
-
-
+- Pour exécuter une ligne de code, il suffit de placer le curseur sur une partie de celle-ici, puis CRTL + ENTREE ; 
 
 - Sur windows, le raccourci ALT + 6 permets d'afficher le "<-" 
+
+- N'utilisez pas d'accent ou d'espaces dans vos noms de dossiers !
+
+- il n'y a pas d'espace entre une fonction et ses arguments : 
+
+```{r, eval = F}
+mean( data$Var) #pas bien
+mean(data$Var) #bien
+```
+
+- Régle d'or : sur R, pas besoin d'utiliser sa souris. Moins on utilise le "cliq", mieux c'est.
 
 ---
 class: inverse, center, middle
 
-# Réaliser des jointures attributaires
+# Enrichir des données spatiales : réaliser des jointures attributaires
 
 ```{r setup, include=FALSE}
 setwd("C:/Users/Julien M/Dropbox/ENS/Cours/FormationR/statsmappingwithR/statsmappingwithR/03_DataWrangling")
@@ -65,7 +73,7 @@ options(tidyverse.quiet = TRUE)
 </style>
 
 ---
-## Ouvrir un objet spatial
+## Rappel : ouvrir un objet spatial
 
 - Avec le fonction _st_read_ :
 ```{r, echo = T, eval=T}
@@ -73,11 +81,11 @@ idf_sf <- st_read(dsn = "data/parispc_com.shp",
                   crs = 2154, 
                   stringsAsFactors = F)
 ```
-- Le chemin du fichier est indiqué par des guillements.
+- Le chemin du fichier est indiqué par des guillemets.
 - Le fichier _.shp_ doit être dans le même dossier que les fichiers _.dbf_ et _.shx_.
 
 ---
-## Explorer les variables d'un objet 
+## Explorer les variables d'un objet : deux fonctions
 
 - La fonction _summary()_ renseigne sur la distribution d'une variable quantitative :
 
@@ -92,13 +100,15 @@ table(idf_sf$NOM_DEPT)
 ```
 
 ---
-## La fonction _table_
+## La fonction _table_ : calculer des fréquences
 
 On peut stocker le résultat de la fonction _table()_ dans un _data.frame_, où : 
 
-  - une colonne avec les modalités de la variable ; 
-  - une colonne avec la fréquence de la modalité ; 
-  - chaque ligne correspond à une modalité
+  - une colonne "Var1" stocker les modalités de la variable (variable quali) ; 
+  - une colonne "Freq" stocke la fréquence de chaque modalité (variable quanti) ; 
+  - chaque ligne correspond à une modalité.
+
+Ici, 4 départements, donc un tableau de 4 lignes.
 
 ```{r, echo = T, eval=T, fig.align="center"}
 freq_NOM_DEPT <- as.data.frame(table(idf_sf$NOM_DEPT))
@@ -117,7 +127,7 @@ Pour effectuer une jointure, il faut donc disposer d'une variable :
 - de même format ( _character_ / _integer_ ).
 
 ---
-## Exercice
+# Exercice
 
 On veut ajouter des variables de l'INSEE au fichier spatial _idf_sf_ : 
 
@@ -131,23 +141,32 @@ On veut ajouter des variables de l'INSEE au fichier spatial _idf_sf_ :
 
 ```{r, echo = T, eval=T, include = T}
 soc_eco <- read.csv("data/paris_soc_eco.csv")
-glimpse(soc_eco)
 ```
 
----
-## Solution
+En explorant visuellement les deux objets, on repère que le code de la commune est commun aux deux tableaux, même s'il est stocké dans une variable dont le nom diffère : 
 
 ```{r, echo = T, eval = T}
-length(soc_eco$CODGEO) #compte le nombre d'occurences uniques
-length(idf_sf$INSEE_COM) #compte le nombre d'occurences uniques
+glimpse(soc_eco$CODGEO) # fonction glimpse donne un aperçu d'un objet, d'un vecteur
+glimpse(idf_sf$INSEE_COM)
 ```
 
---
+Mais dispose-t-on d'un identifant par commune ?
+```{r, echo = T, eval = T}
+length(soc_eco$CODGEO) #compte le nombre d'occurrences uniques
+length(idf_sf$INSEE_COM) #compte le nombre d'occurrences uniques
+```
 
-Mais...
+Il semble que ce soit le cas : chaque vecteur compte 143 valeurs uniques, soit 143 codes postaux.
+
+---
+## Jointure
+
+Mais ces variables, ou vecteurs, sont-ils du même format ? 
+
+On peut vérifier avec la fonction _class_ :
 ```{r, echo = T, eval=T, include = T}
-class(soc_eco$CODGEO) #compte le nombre d'occurences uniques
-class(idf_sf$INSEE_COM) #compte le nombre d'occurences uniques
+class(soc_eco$CODGEO) 
+class(idf_sf$INSEE_COM) 
 ```
 
 ---
@@ -157,53 +176,77 @@ Comment créer un identifiant commun ?
 
 --
 
+On peut créer une nouvelle variable dans le fichier csv, qui : 
+
+- stocke les codes postaux ;
+- ait le même intitulé que la variable du fichier _idf_sf_, soit "INSEE_COM" ; 
+- soit au format que la variable du fichier _idf_sf_, soit au format _character_ 
+
+1. On crée donc une nouvelle variable avec l'opérateur d'assignation
+2. Cette nouvelle variable stocke les valeurs du vecteur "CODGEO" 
+3. En les convertissant au format _character_ grâce à la fonction _as.character()_ :
+
 ```{r, echo = T, eval = T}
 soc_eco$INSEE_COM <- as.character(soc_eco$CODGEO)
-glimpse(soc_eco$INSEE_COM)
+glimpse(soc_eco$INSEE_COM) # On a bien un vecteur de type character
 ```
 
 ---
 ## Réaliser une jointure : les fonctions _join_
 
+Il y a plusieurs types de jointures : 
 
-```{r, echo = F, fig.align="center", out.width="80%"}
+```{r, echo = F, fig.align="center", out.width="70%"}
 include_graphics("img/dplyr-joins.png")
 ```
 
 ---
 ## La fonction _left_join_
 
-La fonction _left_join_ garde les unités présentes dans le premier objet, et supprime les individus du 2e objet qui ne s'y trouvent pas. 
+La fonction _left_join_ garde le premier objet et y "colle" les variables du 2e objet. 
+
+Elle garde *toutes* les lignes du premier objet : les lignes du 2e objet qui ne trouvent pas d'unités correspondantes sont éliminées. 
+
+L'ordre de la fonction est donc important : 
+
+- les variables de l'objet 2 sont transférées VERS l'objet 1.
+- En d'autres termes, les lignes de l'objet 1 reçoivent les variables de l'objet 2. 
 
 ```{r, eval=F}
 object <- left_join(objet1, objet2, by = "IDENTIFIANT")
 ```
 
---
+C'est l'objet au format SF qui nous intéresse : il comporte les données géométriques qui nous permettent de cartographier nos données. 
 
-### Exercice
+C'est donc l'objet SF qui doit recevoir les données d'un autre objet, ici un _data.frame._ 
+
+---
+
+# Exercice
 Réalisez une jointure entre les données de l'INSEE et le shapefile des communes.
 
 --
 ## Solution 
 
 ```{r, eval = T, echo = T}
-idf_sf <- left_join(idf_sf, soc_eco, by = "INSEE_COM")
-colnames(idf_sf)
+idf_sf <- left_join(idf_sf, #objet 1 : l'objet sf
+                    soc_eco, #objet 2 : le data.frame
+                    by = "INSEE_COM") # l'identifiant commun
+colnames(idf_sf) #Vérifier si les variables de soc_eco ont été ajoutées
 ```
 
 ---
 ## Exploration
 
-On regarde le revenu médian en 2007 : 
+On peut rapidement visualiser le revenu médian en 2007 : 
 
-```{r, echo = T, eval = T, out.width = "60%"}
+```{r, echo = T, eval = T, out.width = "60%", out.height="80%"}
 mapview(idf_sf, zcol = "RFUCQ207")
 ```
 
 
 ---
-## Bilan du format SF
+# Bilan :
 
 Le package SF joint dans un même objet : 
 
@@ -212,49 +255,58 @@ Le package SF joint dans un même objet :
 
 On peut, par des jointures, associer les deux types de données. 
 
-L'objet SF peut ainsi être manipulé dans un but de : 
-  - cartographie ; 
-  - d'analyse statistique ; 
-  - d'analyse spatiale.
+Vous savez donc *importer* des données spatiales, les *explorer*, et les *enrichir* par des jointures.
+
+Avant de passer à la cartographie et à l'analyse statistique, il faut pouvoir les manipuler, c'est à dire sélectionner les unités spatiales (les lignes) et les variables (les colonnes) qui vous intéressent. 
+
+Pour manipuler les objets dans R (ce que l'on nomme communément le _data wrangling_), on utilise un langage, une grammaire qui se nomme le _tidyverse_.
  
  
 ---
 class: inverse, center, middle
-# Manipuler un objet SF avec le Tidyverse
+# Manipuler un objet SF avec le tidyverse
 
 ```{r, echo = F, fig.align="center", out.width="80%"}
 include_graphics("img/core_packages.png")
 ```
 
 ---
-## Le principe de _Tidy Data_
+## Le _tidyverse_
+
+Le _tidyverse_ est une famille de _packages_ pour manipuler, visualiser et modéliser des données : c'est le langage de référence sur R.
+
+Ce langage, ou plutôt cette grammaire, se fonde sur un principe : celui de _tidy_data_, ou "donnée rangée". 
 
 Les principes d’un jeu de données dit "tidy" sont les suivants :
 
   - chaque variable est une colonne ;
   - chaque observation est une ligne ;
-  - chaque type d’observation est dans une table différente
+  - chaque type d’observation est dans une table différente.
   
-Ce concept a été développé par Hadley Wickham, qui le présente dans un [article](https://vita.had.co.nz/papers/tidy-data.pdf) fondateur publié dans le _Journal of Statistical Software_.
+Ce concept a été développé par Hadley Wickham, qui le présente dans un [article](https://vita.had.co.nz/papers/tidy-data.pdf) fondateur publié dans le _Journal of Statistical Software_ en 2014.
 
+---
+## Le package _dplyr_
 
-Le _tidyverse_ propose un ensemble de _packages_ pour manipuler, visualiser et modéliser des données : c'est le langage de référence sur R.
+Un package nous intéresse en particulier : _dplyr_
 
-Lire les chapitres 6, 7 et 10 de [Introduction à R et au tidyverse](https://juba.github.io/tidyverse/06-tidyverse.html) de Julien Barnier.
-
-Le package _dplyr_ comporte une série de fonctions qui permettent de manipuler les objets SF : 
+Celui ci comporte une série de fonctions (ou verbes) qui permettent de manipuler tout objet dans R, donc les objets SF : 
 - à partir des colonnes : _select_, _rename_, _mutate_ ; 
 - à partir des lignes : _filter_ ; 
-- pour réaliser des calculs : _group_by_ et _summarise_
+- pour réaliser des calculs groupés : _group_by_ et _summarise_
 
-
+Vouus pouvez consulter à ce propos les chapitres 6, 7 et 10 de [Introduction à R et au tidyverse](https://juba.github.io/tidyverse/06-tidyverse.html) de Julien Barnier.
 
 ---
 ## Les verbes : _select_
 
+
 - Sélectionner une ou des variables : 
 
 ```{r, eval = F}
+# Syntaxe : on garde les colonnes Var1 et Var2 de l'objet "data_sf"
+select(data_sf, Var1, Var2) #On garde les colonnes Var1 et Var2 de l'objet "data_sf"
+#On garde les colonnes INSEE_COM et POP2008 de l'objet idf_sf
 select(idf_sf, INSEE_COM, POP2008)
 ```
 
@@ -275,36 +327,43 @@ select(idf_sf, POP1936:POP2008)
 
 
 ```{r, eval = F}
-rename(df, NouveauNom = AncienNOM)
+rename(data, NouveauNom = AncienNOM)
 ```
 
+--
+### Question :
 Que devrait on écrire pour renommer la variable "POP2008" en "Population" ? 
 
 --
 
-Solution : 
+### Solution : 
 
 ```{r, eval = F}
 idf_sf <- rename(idf_sf, Population = POP2008)
 ```
 
+Attention : pour sauvegarder le changement de nom, il faut "écraser" le fichier existant en utilisant à nouveau le signe "<-" !
 
 ---
 ## Les verbes : _mutate_
 
-_Mutate_ crée de nouvelles variables, généralement à partir de variables existantes
+La fonction _mutate_ crée de nouvelles variables, généralement à partir de variables existantes.
 
-```{r, echo = F, fig.align="center", out.width="70%"}
+On peut donc additionner, soustraire, diviser _etc._ les variables pour en créer de nouvelles. 
+
+Ici, on crée une colonne "C" en aditionant les colonnes A et B : 
+
+```{r, echo = F, fig.align="center", out.width="60%"}
 include_graphics("img/dplyr_mutate.png")
 ```
 
 ---
 ## Les verbes : _mutate_
 
-On peut donc additionner, soustraire, diviser _etc._ les variables pour en créer de nouvelles. 
+La grammaire de _mutate_ : 
 
 ```{r, echo = T, eval=F, fig.align="center", out.width="70%"}
-mutate(df, NouvelleVariable = Var1 + Var2)
+mutate(data, NouvelleVariable = Var1 + Var2)
 ```
 
 --
@@ -317,23 +376,24 @@ Calculez le taux d'évolution de la population entre 1936 et 2008
 
 ```{r, echo = T,  fig.align="center", out.width="70%"}
 idf_sf <- mutate(idf_sf, EvolPop = (POP2008-POP1936)/POP1936*100)
-mapview(idf_sf, zcol = "EvolPop")
 ```
 
 ---
-## Bilan
+## Bilan : manipuler des colonnes
 
 Les verbes _rename_, _mutate_, _select_ permettent de manipuler des colonnes, ou variables. 
 
-Ils permettent de manipuler un tableau ou un objet SF sans utiliser le signe $.
+Ils permettent de manipuler un tableau ou un objet SF sans utiliser les signes $ ou [ ]
 
-On peut ainsi s'en servir pour préparer des jointures : 
+On peut ainsi utiliser ces fonctions pour préparer des jointures. 
+
+Ces deux lignes de code produisent le même résultat : créer une nouvelle variable à partir d'une variable existante, en passant du format _integer_ au format _character_
 
 ```{r, eval = F, echo = T}
-# En base R
+# Syntaxe de base sur R
 soc_eco$INSEE_COM <- as.character(soc_eco$CODGEO)
 
-# Avec le tidyverse
+# Syntaxe du tidyverse
 soc_eco <- mutate(soc_eco, INSEE_COM = as.character(CODGEO))
 ```
 
@@ -343,42 +403,39 @@ soc_eco <- mutate(soc_eco, INSEE_COM = as.character(CODGEO))
 
 - Sélectionne des lignes d’une table selon une ou plusieurs conditions.
 
-- On filtre les individus selon leurs _modalités_, leurs _valeurs_
+- On filtre les individus (ou les lignes) selon leurs _modalités_, leurs _valeurs_
 
-```{r, echo = F, fig.align="center", out.width="80%"}
+```{r, echo = F, fig.align="center", out.width="90%"}
 include_graphics("img/dplyr_filter.jpg")
 ```
 
 ---
 ## Les opérateurs
 
-On utilise des opérateurs : 
+Pour filtrer ces lignes, on utilise des [opérateurs](http://larmarange.github.io/analyse-R/conditions-et-comparaisons.html) : <, >, ==, !=, & _etc._
 
-- Pour filtrer les lignes selon une variable catégorielle ; 
+- Pour filtrer selon une variable catégorielle : 
 
 ```{r, eval = F}
-filter(Var1 == "TEXTE")
+filter(data, Var1 == "TEXTE")
 ```
-- Pour filtrer les lignes selon une variable catégorielle ; 
+- Pour filtrer selon une variable quantitative : 
 
 ```{r, eval = F}
-filter(Var1 == 8)
-```
-
-
-- Supérieur à (>) ou Iinférieur à (<) pour filtrer avec une variable quantitative ; 
-```{r, eval = F}
-filter(Var1 > 8)
+filter(data, Var1 == 8) # est égal à 
+filter(data, Var1 > 8) # est strictement supérieur à 
+filter(data, Var1 >= 8) #inférieur ou égal à 
 ```
 
-- On utilise l'opérateur _&_ pour combiner les critères ;
+- On utilise l'opérateur _&_ pour combiner les critères :
+
 ```{r, eval = F}
-filter(Var1 > 8 & Var2 < 20 & Var 3 == "Station")
+filter(data, VarQuanti > 8 & VarQuali  == "TEXTE")
 ```
 
 
 ---
-### Exercice
+# Exercice
 
 Sélectionner dans un nouvel objet : 
   - les communes qui appartiennent à la municipalité de Paris ;
@@ -395,104 +452,124 @@ rich <- filter(idf_sf, RFUCQ207 > median(RFUCQ207))
 ---
 ## Enchainer les opérations : le _pipe_ ou %>%
 
-Le résultat de ce qui se trouve à gauche du pipe est passé comme argument à ce qui se trouve à droite :
+L'intérêt majeur de _dplyr_ tient à cette fonction : %>%, dite _pipe_. 
+
+Le _pipe_ permet de combiner plusieurs opérations en une même séquence de tâches.
+
+Principe : Le résultat de ce qui se trouve _à gauche_ du pipe est passé comme argument à ce qui se trouve _à droite_ :
+
+Julien Barnier propose des explications [ici](https://juba.github.io/tidyverse/10-dplyr.html#pipe).
+
+Décrivons la séquence suivante basée sur un _pipe_, qui crée un nouvel objet _paris_sf_, qui stockera la densité de population par département :
 
 ```{r, echo = T}
-paris_sf <- idf_sf %>% select(INSEE_COM, NOM_DEPT, POP2008) %>%
-            filter(NOM_DEPT == "PARIS") %>%
-            mutate(Superficie = st_area(.)) %>% #calcul superficie
-            mutate(Superficie_km = as.numeric(Superficie/10^6)) %>%
-            mutate(Density = POP2008/Superficie_km) 
+paris_sf <- idf_sf %>% # choisir objet de départ, ici l'objet idf_sf
+    select(INSEE_COM, NOM_DEPT, POP2008) %>% # sélectionner 3 colonnes
+    filter(NOM_DEPT == "PARIS") %>% # filtrer les communes de Paris
+    mutate(Superficie = st_area(.)) %>% # calculer superficie
+    mutate(Superficie_km = as.numeric(Superficie/10^6)) %>% # En km2
+    mutate(Density = POP2008/Superficie_km) # calculer densité
 ```
 ---
 
+Exploration du nouvel objet : 
 
 ```{r, echo = T, fig.align="center"}
 mapview(paris_sf, zcol = "Density")
 ```
 
 ---
-## _Group_by_ et _summarise_
+## Les fonctions _Group_by_ et _summarise_
 
-- La fonction _group_by_ permets de regrouper des individus selon les modalités d'une ou plusieurs variables. 
+- La fonction _group_by_ regroupe les lignes  individus selon les modalités d'une ou plusieurs variables. 
 
-- Associée à la fonction _summarise_, elle permets d'effectuer des calculs groupés 
+- Associée à la fonction _summarise_, on peut effectuer des calculs groupés : par exemple, calculer des sommes, des moyennes, des  par catégorie.
 
 ```{r, warning=F, fig.align="center"}
 dpt_sf <- idf_sf %>%
-  group_by(NOM_DEPT) %>% #regroupe lignes
-  summarise(Pop2008 = sum(POP2008), #additione
-            TotalCommunes = n()) #compte
+  group_by(NOM_DEPT) %>% #regroupe lignes par département
+  summarise(Pop2008 = sum(POP2008), # total de population
+            TotalCommunes = n()) # compte le nombre d'unités
 ```
 
+La fonction _sum_ calcule le total de population par département
+
+La fonction _n()_ compte l'occurence / le nombre d'entités pour chaque modalité.
+
 ---
-## _Group_by_ et _summarise_
+## Les fonctions _Group_by_ et _summarise_
+
+On obtient un objet SF  : 
+- avec autant de lignes que de modalités de la variable groupée, soit ici 4.
+- avec 3 colonnes : la variable groupée, et les 2 colonnes crées par la fonction _summarise_
 
 ```{r, echo = T}
 dpt_sf
 ```
 
 ---
-## _Group_by_ et _summarise_
+## Les fonctions _Group_by_ et _summarise_
 
-Le format SF permet donc de traiter à la fois les données géométriques et les données attributaires
+Dans ce nouvel objet, les polygones des municipalités ont été fusionnés selon leur département d'appartenance.
 
 ```{r, echo = T}
 mapview(dpt_sf)
 ```
 
 ---
-## _Group_by_ et _summarise_
+## Les fonctions _Group_by_ et _summarise_
 
-Mais on peut parfois vouloir enlever les données géométriques. 
+Le format SF permet donc de traiter à la fois les données géométriques et les données attributaires. 
 
-Pour cela, on peut utiliser la fonction _st_set_geometry_
+Mais on peut parfois vouloir enlever les données géométriques pour réduire le calcul. 
 
-```{r}
+Pour cela, on peut utiliser la fonction _st_set_geometry_ :
+
+```{r, echo = T}
 dpt_df <- dpt_sf %>% st_set_geometry(NULL)
 
-class(dpt_sf)
+class(dpt_sf) 
 class(dpt_df)
 ```
 
 ---
-## Exercice
+# Exercice à rendre avant le 01/11 
 
 - Calculez le nombre total de meurtres par grande région des USA avec le fichier `murders.csv`
 
-- Calculez et visualisez la densité de  population par département avec le fichier `parispc_com.shp`
+- Calculez et visualisez la densité de  population par département en 2008 avec le fichier `parispc_com.shp`
 
 
 ---
-# Exercice pour la semaine prochaine
+# Exercice à rendre avant le le 01/11 
 
-Rédigez et envoyer un script où vous commentez chacun des exercices suivants : 
+Rédigez et envoyez un script où vous réalisez, en les commentant, chacune des tâches suivantes :
 
-- Ouvrez le shapefile `lieux-de-tournage-a-paris.shp` dans RStudio et stockez le dans un objet qui s'appelle _movies_paris_. NB Le système de projection est WGS 84, soit epsg = 4326. 
-- Optionnel : reprojetez l'objet dans une projection adaptée, en utilisant la fonction [st_tranform](https://rcarto.github.io/carto_avec_r/chapitre1.html#les-syst%C3%A8mes-de-projections)
-- Décrivez le tableau de données en utilisant un vocabulaire approprié (individus, type de variables)
-- Explorer l'objet spatialement : quels tournages ont été réalisés à proximité du campus Jourdan ? 
-- Combien de lieux de tournage sont associés à une série Web ?
-- Créez un data.frame qui renseigne sur le nombre de tournages réalisés par boite de production. 
-- Divisez l'objet _movies_paris_ en deux objets : 
-    - _tv_show_paris_ pour les séries TV ; 
-    - _long_paris_ pour les longs métrages
+1. Ouvrez le shapefile `lieux-de-tournage-a-paris.shp` dans RStudio et stockez le dans un objet qui s'appelle _movies_paris_. NB Le système de projection est WGS 84, soit epsg = 4326. 
+2. Reprojetez l'objet dans une projection adaptée, en utilisant la fonction [st_tranform](https://rcarto.github.io/carto_avec_r/chapitre1.html#les-syst%C3%A8mes-de-projections)
+3. Décrivez le tableau de données : combien d'indivius ? Quels types de variables ?
+4. Combien de lieux de tournage sont associés à une série Web ?
+5. Créez un data.frame qui renseigne sur le nombre de tournages réalisés par boite de production. 
+6. Divisez l'objet _movies_paris_ en deux objets distincts : 
+    - _tvshowsparis_ pour les séries TV ; 
+    - _long_paris_ pour les longs métrages.
 
 ---
-# Exercice pour la semaine prochaine
+# Exercice à rendre avant le 01/11
 
-- Quel est l'arrondissement de Paris qui accueille le plus de tournages en 2016 ? En 2019 ? 
-- Quel est l'arrondissement de Paris qui accueille le plus de tournages de long  métrage en 2018 ? 
-- Quel est l'arrondissement où se déroule le plus de tournage de la série "Emily in Paris" ?
-- Proposez une carte qui visualise les localisation de la 8e saison de la série Engrenages. Quels types de localisations et quels arrondissements vous semblent le plus associé à la série ? 
-- Proposez une visualisation des lieux de tournages du film "120 battements par minute". 
+7. Quel est l'arrondissement de Paris qui accueille le plus de tournages en 2016 ? En 2019 ? NB. Il vous sfaut utilier la fonction _group_by_ en utilisant 2 variables...
+8. Quel est l'arrondissement de Paris qui accueille le plus de tournages de long métrage en 2018 ? 
+9. Quel est l'arrondissement où se déroule le plus de tournage de la série "Emily in Paris" ?
+10. Proposez une visualiation des lieux de tournage de 8e saison de la série Engrenages. Quels types de localisations et quels arrondissements sont le plus associés à la série ? 
+11. Proposez une visualisation des lieux de tournages du film "120 battements par minute". 
 
+Toutes les fonctions et packages vus en cours vous permettent de répondre à ces questions. 
 
 ---
 
 class: center, middle
 
-# Merci !
+# Fin
 
 Slides crées avec le package [**xaringan**](https://github.com/yihui/xaringan).
 
