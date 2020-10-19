@@ -12,7 +12,8 @@ Certains des matériaux de ce cours ont été adaptés ou inspirés de plusieurs
 
 * [Les cours de Claude Grasland](http://grasland.script.univ-paris-diderot.fr/).
 * [Introduction à R et au tidyverse](https://juba.github.io/tidyverse/) de Julien Barnier.
-* [Cartographie avec R](https://rcarto.github.io/carto_avec_r/) de Timothée Giraud et Hugues Pecout
+* [Cartographie avec R](https://rcarto.github.io/carto_avec_r/) de Timothée Giraud et Hugues Pecout.
+* [R et espace](https://framabook.org/r-et-espace/), du collectif "Groupe ElementR".
 
 
 
