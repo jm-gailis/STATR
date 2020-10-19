@@ -381,8 +381,8 @@ plot(idf_sf)
 ```{r, echo = T, eval=T, fig.align="center"}
 plot(idf_sf["NOM_DEPT"]) #choisir une colonne
 ```
----
 
+---
 ## Explorer un objet spatial avec le package _mapview_
 
 ```{r, echo = T, eval=T, fig.align="center"}
