@@ -26,18 +26,18 @@ class: inverse, center, middle
 
 - Pour exécuter une ligne de code, il suffit de placer le curseur sur une partie de celle-ici, puis CRTL + ENTREE ; 
 
-- Sur windows, le raccourci ALT + 6 permets d'afficher le "<-" 
+- Sur Windows, le raccourci ALT + 6 permets d'afficher le "<-", qui est nécessaire pour créer ou remplacer un objet.
 
-- N'utilisez pas d'accent ou d'espaces dans vos noms de dossiers !
+- N'utilisez pas d'accent ou d'espace dans vos noms de dossiers/fichiers !
 
-- il n'y a pas d'espace entre une fonction et ses arguments : 
+- Il n'y a pas d'espace entre une fonction et ses arguments : 
 
 ```{r, eval = F}
-mean( data$Var) #pas bien
-mean(data$Var) #bien
+mean( data$Var) # Pas bien
+mean(data$Var) # Bien
 ```
 
-- Régle d'or : sur R, pas besoin d'utiliser sa souris. Moins on utilise le "cliq", mieux c'est.
+- Règle d'or : réaliser le plus possible vos tâches en écrivant du code (ex : pour ouvrir un fichier csv). Sur R, on utilise principalement le clavier, car toute manipulation réalisée avec une souris n'est pas reproductible. 
 
 ---
 class: inverse, center, middle
@@ -87,13 +87,13 @@ idf_sf <- st_read(dsn = "data/parispc_com.shp",
 ---
 ## Explorer les variables d'un objet : deux fonctions
 
-- La fonction _summary()_ renseigne sur la distribution d'une variable quantitative :
+- La fonction _summary()_ renseigne sur la distribution d'une variable quantitative (format _numeric_ ou _integer_) :
 
 ```{r, echo = T, eval=T, fig.align="center"}
 summary(idf_sf$POPULATION)
 ```
 
-- La fonction _table()_ renseigne sur la distrbution d'une variable de type _character_ :
+- La fonction _table()_ renseigne sur la distrbution d'une variable qualitative stockée au format _character_ :
 
 ```{r, echo = T, eval=T, fig.align="center"}
 table(idf_sf$NOM_DEPT)
@@ -108,7 +108,7 @@ On peut stocker le résultat de la fonction _table()_ dans un _data.frame_, où 
   - une colonne "Freq" stocke la fréquence de chaque modalité (variable quanti) ; 
   - chaque ligne correspond à une modalité.
 
-Ici, 4 départements, donc un tableau de 4 lignes.
+Ici, 4 départements différents, donc on obtient un tableau de 4 lignes.
 
 ```{r, echo = T, eval=T, fig.align="center"}
 freq_NOM_DEPT <- as.data.frame(table(idf_sf$NOM_DEPT))
@@ -132,9 +132,9 @@ Pour effectuer une jointure, il faut donc disposer d'une variable :
 On veut ajouter des variables de l'INSEE au fichier spatial _idf_sf_ : 
 
 1. Créez un projet, puis un environnement de travail et créez un script.
-2. Ouvrez le fichier spatial.
-3. Ouvrez le fichier csv. 
-4. Quelle variable peut servir à réaliser la jointure ? 
+2. Ouvrez le shapefile pour en faire un objet sf
+3. Ouvrez le fichier csv pour en faire un dataframe. 
+4. Parcourez visuellement les deux objets : quelle variable peut servir à réaliser la jointure ? 
 
 ---
 ## Solution
@@ -150,7 +150,8 @@ glimpse(soc_eco$CODGEO) # fonction glimpse donne un aperçu d'un objet, d'un vec
 glimpse(idf_sf$INSEE_COM)
 ```
 
-Mais dispose-t-on d'un identifant par commune ?
+---
+### Mais dispose-t-on d'un identifant par commune ?
 ```{r, echo = T, eval = T}
 length(soc_eco$CODGEO) #compte le nombre d'occurrences uniques
 length(idf_sf$INSEE_COM) #compte le nombre d'occurrences uniques
@@ -170,31 +171,32 @@ class(idf_sf$INSEE_COM)
 ```
 
 ---
-## Exercice
+### Exercice
 
 Comment créer un identifiant commun ?
 
 --
-
+### Solution
 On peut créer une nouvelle variable dans le fichier csv, qui : 
 
 - stocke les codes postaux ;
 - ait le même intitulé que la variable du fichier _idf_sf_, soit "INSEE_COM" ; 
-- soit au format que la variable du fichier _idf_sf_, soit au format _character_ 
+- soit au format que la variable du fichier _idf_sf_, soit au format _character_?
 
-1. On crée donc une nouvelle variable avec l'opérateur d'assignation
-2. Cette nouvelle variable stocke les valeurs du vecteur "CODGEO" 
-3. En les convertissant au format _character_ grâce à la fonction _as.character()_ :
+1. On crée donc une nouvelle variable avec l'opérateur d'assignation.
+2. Cette nouvelle variable stocke les valeurs du vecteur "CODGEO".
+3. Ces valeurs, grâce à la fonction _as.character()_, sont tranformées en type _character_.
 
 ```{r, echo = T, eval = T}
 soc_eco$INSEE_COM <- as.character(soc_eco$CODGEO)
-glimpse(soc_eco$INSEE_COM) # On a bien un vecteur de type character
+glimpse(soc_eco$INSEE_COM) 
 ```
 
+On a bien une colonne de 143 lignes, de type "chr", ou _character_.
 ---
 ## Réaliser une jointure : les fonctions _join_
 
-Il y a plusieurs types de jointures : 
+Il y a plusieurs types de jointures pour coller deux tableaux, ou deux objets. 
 
 ```{r, echo = F, fig.align="center", out.width="70%"}
 include_graphics("img/dplyr-joins.png")
@@ -203,7 +205,7 @@ include_graphics("img/dplyr-joins.png")
 ---
 ## La fonction _left_join_
 
-La fonction _left_join_ garde le premier objet et y "colle" les variables du 2e objet. 
+La fonction _left_join_ garde le premier objet et y "colle" les variables (ou colonnes) du 2e objet. 
 
 Elle garde *toutes* les lignes du premier objet : les lignes du 2e objet qui ne trouvent pas d'unités correspondantes sont éliminées. 
 
@@ -216,7 +218,7 @@ L'ordre de la fonction est donc important :
 object <- left_join(objet1, objet2, by = "IDENTIFIANT")
 ```
 
-C'est l'objet au format SF qui nous intéresse : il comporte les données géométriques qui nous permettent de cartographier nos données. 
+C'est l'objet au format SF qui nous intéresse : il comporte les données géométriques qui nous permettent de cartographier.
 
 C'est donc l'objet SF qui doit recevoir les données d'un autre objet, ici un _data.frame._ 
 
@@ -232,7 +234,7 @@ Réalisez une jointure entre les données de l'INSEE et le shapefile des commune
 idf_sf <- left_join(idf_sf, #objet 1 : l'objet sf
                     soc_eco, #objet 2 : le data.frame
                     by = "INSEE_COM") # l'identifiant commun
-colnames(idf_sf) #Vérifier si les variables de soc_eco ont été ajoutées
+colnames(idf_sf) #Vérifier si les variables ont été ajoutées
 ```
 
 ---
@@ -323,7 +325,7 @@ select(idf_sf, POP1936:POP2008)
 ```
 
 ---
-# Les verbes : _rename_
+## Les verbes : _rename_
 
 
 ```{r, eval = F}
@@ -353,9 +355,10 @@ On peut donc additionner, soustraire, diviser _etc._ les variables pour en crée
 
 Ici, on crée une colonne "C" en aditionant les colonnes A et B : 
 
-```{r, echo = F, fig.align="center", out.width="60%"}
+```{r, echo = F, fig.align="center", out.width="40%"}
 include_graphics("img/dplyr_mutate.png")
 ```
+.center[[Source : Allison Horst](https://github.com/allisonhorst/stats-illustrations)]
 
 ---
 ## Les verbes : _mutate_
@@ -383,11 +386,11 @@ idf_sf <- mutate(idf_sf, EvolPop = (POP2008-POP1936)/POP1936*100)
 
 Les verbes _rename_, _mutate_, _select_ permettent de manipuler des colonnes, ou variables. 
 
-Ils permettent de manipuler un tableau ou un objet SF sans utiliser les signes $ ou [ ]
+Ils permettent de manipuler un tableau ou un objet SF sans utiliser les signes $ ou [ ].
 
 On peut ainsi utiliser ces fonctions pour préparer des jointures. 
 
-Ces deux lignes de code produisent le même résultat : créer une nouvelle variable à partir d'une variable existante, en passant du format _integer_ au format _character_
+Les deux lignes de code suivantes produisent le même résultat : créer une nouvelle variable à partir d'une variable existante, en passant du format _integer_ au format _character_.
 
 ```{r, eval = F, echo = T}
 # Syntaxe de base sur R
@@ -403,11 +406,12 @@ soc_eco <- mutate(soc_eco, INSEE_COM = as.character(CODGEO))
 
 - Sélectionne des lignes d’une table selon une ou plusieurs conditions.
 
-- On filtre les individus (ou les lignes) selon leurs _modalités_, leurs _valeurs_
+- On filtre les individus (ou les lignes) selon leurs _modalités_, leurs _valeurs_.
 
 ```{r, echo = F, fig.align="center", out.width="90%"}
 include_graphics("img/dplyr_filter.jpg")
 ```
+.center[[Source : Allison Horst](https://github.com/allisonhorst/stats-illustrations)]
 
 ---
 ## Les opérateurs
@@ -541,7 +545,7 @@ class(dpt_df)
 
 
 ---
-# Exercice à rendre avant le le 01/11 
+# Exercice à rendre avant le 01/11 
 
 Rédigez et envoyez un script où vous réalisez, en les commentant, chacune des tâches suivantes :
 
@@ -557,13 +561,13 @@ Rédigez et envoyez un script où vous réalisez, en les commentant, chacune des
 ---
 # Exercice à rendre avant le 01/11
 
-7. Quel est l'arrondissement de Paris qui accueille le plus de tournages en 2016 ? En 2019 ? NB. Il vous sfaut utilier la fonction _group_by_ en utilisant 2 variables...
-8. Quel est l'arrondissement de Paris qui accueille le plus de tournages de long métrage en 2018 ? 
-9. Quel est l'arrondissement où se déroule le plus de tournage de la série "Emily in Paris" ?
-10. Proposez une visualiation des lieux de tournage de 8e saison de la série Engrenages. Quels types de localisations et quels arrondissements sont le plus associés à la série ? 
+7. Quel est l'arrondissement de Paris qui accueille le plus de tournages en 2016 ? En 2019 ? _NB. Il vous faut utiliser la fonction group_by en utilisant 2 variables_...
+8. Quel est l'arrondissement de Paris qui accueille le plus de long métrage en 2018 ? 
+9. Dans quels arrondissements sent déroule la série "Emily in Paris" ?
+10. Proposez une visualisation des lieux de tournage de 8e saison de la série Engrenages. Quels types de localisations et quels arrondissements sont le plus associés à cette série ? 
 11. Proposez une visualisation des lieux de tournages du film "120 battements par minute". 
 
-Toutes les fonctions et packages vus en cours vous permettent de répondre à ces questions. 
+Toutes les fonctions et _packages_ vus en cours vous permettent de répondre à ces questions. 
 
 ---
 
