@@ -537,17 +537,23 @@ class(dpt_df)
 ```
 
 ---
-# Exercice à rendre avant le 01/11 
+# Echauffement : exercices à rendre avant le 01/11 
 
-- Calculez le nombre total de meurtres par grande région des USA avec le fichier `murders.csv`
+A partir du script fourni, effectuez les exercices suivants :
 
-- Calculez et visualisez la densité de  population par département en 2008 avec le fichier `parispc_com.shp`
 
+1. A partir du fichier `murders.csv`, calculez, pour chaque grande région : 
+ - le nombre total de meurtres ;
+ - un ratio pour 100 000 habitants.
+
+2. Calculez et visualisez la densité de  population par département en 2008 avec le shapefile `parispc_com.shp`.
+
+Les données sont accessibles au [lien suivant](https://github.com/jmigozzi/statsmappingwithR/tree/master/03_DataWrangling/data), en téléchargeant le fichier "Exos_data.zip".
 
 ---
-# Exercice à rendre avant le 01/11 
+# Devoir maison à rendre avant le 01/11 
 
-Rédigez et envoyez un script où vous réalisez, en les commentant, chacune des tâches suivantes :
+Dans le même script, effectuez chacune des tâches suivantes :
 
 1. Ouvrez le shapefile `lieux-de-tournage-a-paris.shp` dans RStudio et stockez le dans un objet qui s'appelle _movies_paris_. NB Le système de projection est WGS 84, soit epsg = 4326. 
 2. Reprojetez l'objet dans une projection adaptée, en utilisant la fonction [st_tranform](https://rcarto.github.io/carto_avec_r/chapitre1.html#les-syst%C3%A8mes-de-projections)
@@ -559,15 +565,16 @@ Rédigez et envoyez un script où vous réalisez, en les commentant, chacune des
     - _long_paris_ pour les longs métrages.
 
 ---
-# Exercice à rendre avant le 01/11
+# Devoir maison : suite
 
-7. Quel est l'arrondissement de Paris qui accueille le plus de tournages en 2016 ? En 2019 ? _NB. Il vous faut utiliser la fonction group_by en utilisant 2 variables_...
+7. Quel est l'arrondissement de Paris qui accueille le plus de tournages en 2016 ? En 2019 ? _NB. Il vous faut utiliser la fonction group_by en utilisant 2 variables pour grouper_...
 8. Quel est l'arrondissement de Paris qui accueille le plus de long métrage en 2018 ? 
-9. Dans quels arrondissements sent déroule la série "Emily in Paris" ?
+9. Dans quels arrondissements se déroulent la série "Emily in Paris" ?
 10. Proposez une visualisation des lieux de tournage de 8e saison de la série Engrenages. Quels types de localisations et quels arrondissements sont le plus associés à cette série ? 
 11. Proposez une visualisation des lieux de tournages du film "120 battements par minute". 
+12. Complétez puis envoyez votre script (au format NOM_Prenom.R) par mail avant le 01/11.
 
-Toutes les fonctions et _packages_ vus en cours vous permettent de répondre à ces questions. 
+Toutes les fonctions et _packages_ vus en cours permettent de répondre à ces questions. 
 
 ---
 

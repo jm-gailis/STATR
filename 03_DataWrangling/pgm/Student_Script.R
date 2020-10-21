@@ -32,6 +32,10 @@ total_murd <- murders %>%
               group_by(...) %>%
               summarise(Total = sum(...))
 
+#3. ratio
+total_murd <- total_murd %>% 
+              mutate(....)
+
 
 #----------------------------#
 #          Exercice 2 -----
