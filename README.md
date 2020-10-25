@@ -8,7 +8,11 @@ Ce cours est créé par Julien Migozzi, AGPR à l'Ecole Normale Supérieure, pou
 
 ## Présentations
 
-Séance 3 : slides disponibles [ici](https://jmigozzi.github.io/statsmappingwithR/03_DataWrangling/03_DataWrangling.html#1)
+* Séance 1 : [slides](https://jmigozzi.github.io/statsmappingwithR/01_Introduction/01_Introduction.html)
+
+* Séance 2 : [slides](https://jmigozzi.github.io/statsmappingwithR/02_SpatialData/02_SpatialData.html)
+
+* Séance 3 : [slides](https://jmigozzi.github.io/statsmappingwithR/03_DataWrangling/03_DataWrangling.html#1).
 
 
 ## Remerciements
