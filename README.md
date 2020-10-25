@@ -6,6 +6,11 @@ Ce répertoire héberge les présentations et les jeux de données du cours "Int
 
 Ce cours est créé par Julien Migozzi, AGPR à l'Ecole Normale Supérieure, pour l'année 2020-2021.
 
+## Présentations
+
+Séance 3 : slides disponibles [ici](https://jmigozzi.github.io/statsmappingwithR/03_DataWrangling/03_DataWrangling.html#1)
+
+
 ## Remerciements
 
 Certains des matériaux de ce cours ont été adaptés ou inspirés de plusieurs sources, et notamment : 
