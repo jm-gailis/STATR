@@ -70,7 +70,7 @@ emilie <- movies_paris %>%
   count()
 # Se déroule dans tous les arrondissements sauf le 13, 14, 15, 19, 20.
 
-# Lieux de tournage de la huitième saison de "Engrenages"
+# Lieux de tournage de la huitième saison de "Engrenages" = BIEN
 engrenages <- movies_paris %>%
   filter(str_detect(nom_tournag, "ENGRENAGES SAISON 8") == TRUE ) %>%
   group_by(ardt_lieu) %>%
