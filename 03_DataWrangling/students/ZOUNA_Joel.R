@@ -94,7 +94,7 @@ table(arrond_emily$ardt_lieu)
 # SOLUTION PLUS SIMPLE : 
 tournage_proj %>% 
   filter(nom_tournag=="Emily in Paris") %>%
-    group_by(ardt_lieu) %>%
+  group_by(ardt_lieu) %>%
   summarise (n=n())
 
 #La serie Emily in Paris est tournee dans le 75001 75002 75003 75004 75005 
