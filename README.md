@@ -14,6 +14,9 @@ Ce cours est créé par Julien Migozzi, AGPR à l'Ecole Normale Supérieure, pou
 
 * Séance 3 : [slides](https://jmigozzi.github.io/statsmappingwithR/03_DataWrangling/03_DataWrangling.html#1)
 
+* Séance 4 : [slides](https://jmigozzi.github.io/statsmappingwithR/04_Mapping/04_Mapping.html#1)
+
+
 
 ## Remerciements
 
