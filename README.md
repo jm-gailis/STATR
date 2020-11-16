@@ -16,7 +16,7 @@ Ce cours est créé par Julien Migozzi, AGPR à l'Ecole Normale Supérieure, pou
 
 * Séance 4 : [slides](https://jmigozzi.github.io/statsmappingwithR/04_Mapping/04_Mapping.html#1)
 
-
+* Séance 5 : [slides](https://jmigozzi.github.io/statsmappingwithR/05_MapClassification/05_MapClassification.html#1)
 
 ## Remerciements
 
