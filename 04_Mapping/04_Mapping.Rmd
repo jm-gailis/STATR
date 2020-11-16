@@ -770,7 +770,11 @@ A partir des données proposées par la municipalité de Paris, proposez trois c
 - le nombre de tournages par arrondissement en 2018 ; 
 - une même carte qui montre les localisations de la saison 8 d'Engrenages ET la série Emily in Paris. 
 
-NB : pour la dernière carte, vous devrez recoder vos variales pour créer une nouvelle variable "Tournage". Celle-ci aura deux modalités : "Engrenages" ou "Emily in Paris". Vous devrez donc utiliser la fonction *mutate*, en l'associant aux fonctions *if_else* ou *case_when*, en vous aidant des ressources en ligne (par exemple ce tutoriel [ici](http://larmarange.github.io/analyse-R/recodage.html#combiner-plusieurs-variables-1)). 
+NB : pour la dernière carte, vous deveez recoder vos variables en créant une nouvelle variable "Tournage". 
+
+Celle-ci aura pour chaque point du jeu de données, deux modalités : "Engrenages" ou "Emily in Paris". 
+
+Vous devrez donc utiliser la fonction *mutate*, en l'associant aux fonctions *if_else* ou *case_when*, en vous aidant des ressources en ligne (par exemple ce tutoriel [ici](http://larmarange.github.io/analyse-R/recodage.html#combiner-plusieurs-variables-1)). 
 
 ---
 # Exercice : suite
