@@ -15,8 +15,8 @@ output:
       highlightLines: true
       countIncrementalSlides: false
 editor_options: 
-  chunk_output_type: console
   
+  chunk_output_type: console
 ---
 class: inverse, center, middle
 # Rappel
@@ -25,7 +25,7 @@ class: inverse, center, middle
 
 ```{r setup, include=FALSE}
 
-setwd("C:/Users/Julien M/Dropbox/ENS/Cours/FormationR/statsmappingwithR/statsmappingwithR")
+setwd("C:/Users/jmigozzi/Dropbox/ENS/Cours/FormationR/statsmappingwithR/statsmappingwithR")
 # options(htmltools.dir.version = FALSE)
 # knitr::opts_chunk$set(fig.retina=2)
 #knitr::opts_chunk$set(cache = F)
@@ -61,6 +61,8 @@ movies_paris <- st_read(dsn = "03_DataWrangling/data/lieux-de-tournage-a-paris/l
                         crs = 4326, 
                         stringsAsFactors = F)
 
+
+hist(idf_sf$PCAD07)
 
 
 options(tidyverse.quiet = TRUE)
@@ -307,9 +309,7 @@ Les paramètres de dispersion permettent de mesurer si les valeurs sont plutôt 
 
 - La variance est la première et la plus fondamentale des mesures de dispersion-variation.
 
-- La variance est la somme du carré des écarts à la moyenne rapporté à l’effectif
-
-- La variance est la moyenne du carré des écarts à la moyenne
+- La variance est la somme du carré des écarts à la moyenne rapporté à l’effectif. C'est donc la moyenne du carré des écarts à la moyenne
 
 ```{r, eval = F}
 var(data.frame$Variable)
@@ -318,9 +318,9 @@ var(data.frame$Variable)
 ---
 ### L'écart-type
 
-- L'écart-type est la racine carré de la variance.
+- L'écart-type est la **racine carré de la variance**.
 
-- Il s'exprime dans l'uniité de mesure de la variable étudiée.
+- Il s'exprime dans l'unité de mesure de la variable étudiée.
 
 - Il mesure la dispersion autour de la moyenne des valeurs. 
 
@@ -330,46 +330,51 @@ sd(data.frame$Variable) #sd signifie "standard deviation"
 
 Interprétation : 
 
-- plus la variance ou l'écart-type sont élevés, plus les valeurs sont dispersées autour de la moyenne. 
-- plus ils sont faibles et plus les valeurs sont regroupées.
+- plus la variance ou l'écart-type sont élevés, plus les valeurs sont dispersées autour de la moyenne [*plus les unités spatiales présentent des valeurs hétérogènes*].
+- plus ils sont faibles, plus les valeurs sont regroupées [*plus les unités spatiales présentent des valeurs homogènes*].
 
 ---
 ### Les quantiles
 
-- Une autre manière de mesurer la dispersion est de calculer les quantiles.
-- On appelle quantiles les valeurs du caractère qui définissent les bornes d'une partition en classes d'effectifs égaux.
+- On appelle quantiles les valeurs de la variable qui définissent les bornes d'une partition en **classes d'effectifs égaux**.
+
 - Deux types de quantiles sont communément utilisés : 
 
-  - Les **quartiles** sont les trois valeurs qui permettent de découper la distribution en quatre classes d'effectifs égaux. 
-      - Q1 : 1er quartile est la valeur pour laquelle on a 25% des observations en dessous et 75% au dessus. 
-      - Q2 : 2e quartile est la valeur pour laquelle on a 50% des observations en dessous et 50% au dessus.
-      - Q3:  3e quartile est la valeur pour laquelle on a 75% des observations en dessous et 25% au dessus
+  - Les **quartiles** sont les trois valeurs qui permettent de découper la distribution en quatre classes d'effectifs égaux : 
+  
+      - Q1 : 1er quartile, soit la valeur pour laquelle on a 25% des observations en dessous et 75% au dessus. 
+      - Q2 : 2e quartile, soit la valeur pour laquelle on a 50% des observations en dessous et 50% au dessus.
+      - Q3 : 3e quartile, soit la valeur pour laquelle on a 75% des observations en dessous et 25% au dessus
+      
+      - L'Ecart Inter-quartile : l'intervalle de valeurs existant entre Q1 et Q3. EI, ou IQR,  s'exprime dans l'unité de mesure de la variable. Il dépend du *rang* des observations, et non des valeurs elles-mêmes. 
 
-  - Les **déciles** sont les neufs valeurs de X qui permettent de découper la distribution en dix classes. 
+  - Les **déciles** sont les neufs valeurs de *X* qui permettent de découper la distribution en **dix classes**. 
 
-- L'écart inter-quartile : l'intervalle de valeurs existant entre Q1 et Q3. IQR s'exprime dans l'unité de mesure de la variable. Il dépend du *rang* des observations, et non des valeurs elles-mêmes.
 
 ---
 ### Les quantiles dans R 
 
 
-La fonction *quantile()* permets de calculer les quantiles, en modifiant l'argument *prob.*
+La fonction *quantile()* permet de calculer les quantiles, en modifiant l'argument *prob.*
 
 ```{r, eval = FALSE}
 #pour obtenir la valeur du 1er quartile
-quantile(data.frame$Variable, prob = 0.25) 
+quantile(idf_sf$TXCHOMA07, prob = 0.25) 
 #pour obtenir la valeur des quartiles
-quantile(data.frame$Variable, prob = seq(0, 1, 0.25)) 
+seq(0, 1, 0.25) # on découpe la plge [0,1] en 4 plages d'étendue 0.25
+quantile(idf_sf$TXCHOMA07, prob = seq(0, 1, 0.25)) 
 ```
 
---
+---
+## Regarder une distribution
 
-La fonction *summary()* permet d'obtenir ces mesures. 
+Pour aller vite, la fonction *summary()* permet d'obtenir ces mesures. 
 
 ```{r, eval = FALSE}
-summary(data.frame$Variable)
+summary(idf_sf$TXCHOMA07)
 ```
 
+Obenir ces mesures n'est qu'une étape de la statistique descriptive. Il est également essenntiel de **visualiser la distribution** d'une variable. 
 
 ---
 class: inverse, middle, center
@@ -390,9 +395,9 @@ barplot(table(movies_paris$type_tourna),
 ---
 ### L'histogramme
 
-Il permet de visualiser la forme d'une distribution statistique.
+Il permet de visualiser la forme d'une distribution statistique. C'est la visualisation la plus courante = un réflexe.
 
-La forme de l’histogramme dépend de l’amplitude de classe retenue.
+Attention : la forme de l’histogramme dépend de l’amplitude de classe retenue, qui influe donc sur la perception de la distribution. 
 
 ```{r, eval = T, fig.align="center"}
 par(mfrow = c(2, 2))
@@ -403,7 +408,9 @@ hist(idf_sf$TXCHOMA07, breaks = 10)
 ---
 ### La boite à moustache
 
-```{r, eval = T, fig.align="center"}
+Permet de visualiser les quartiles et les *outliers* (ou valeurs aberrantes).
+
+```{r, eval = T, fig.align="center", out.width="50%"}
 par(mfrow = c(1, 1))
 boxplot(idf_sf$TXCHOMA07, 
         main = "Taux de chômage par commune en iDF")
@@ -442,16 +449,16 @@ C'est une démarche statistique et visuelle.
 
 - Discrétiser revient à opter pour un compromis.
 
-  - Résumer au mieux la distribution (conserver l’hétérogénéité) = *le plus grand nombre de classes*.
+  - Résumer au mieux la distribution (conserver l’hétérogénéité des unités) = *le plus grand nombre de classes*.
   - Construire une carte efficace (synthétiser) = *un faible nombre de classes*.
-  - Choisir des combinaison de variables visuelles pour restituer les spécificités de la distribution statistique = *sémiologie graphique*.
+  - Choisir des combinaisons de variables visuelles pour restituer les spécificités de la distribution statistique = *sémiologie graphique*.
 
-- Réduire l'information pour cartographier comporte des enjeux :
+- Réduire l'information pour cartographier entraine donc des enjeux :
 
   - Conserver l’ordre de grandeur ;
   - Conserver la forme de la distribution ;
   - Conserver la dispersion ;
-  - Décider de conserver ou non les singularités (les unités spatiales aux valeurs extrêmes).
+  - Décider de conserver ou non les singularités (que faire des unités spatiales aux valeurs extrêmes ?).
   
 ---
 ## Les méthodes de discrétisation 
@@ -672,15 +679,21 @@ layoutLayer(title = "Le chômage en IDF",
 
 
 ---
-# Exercice 
+### Exercice 
 
-Sur un même script, en utilisant à chaque fois la statistique univariée et la cartographie :
+A. Proposez une analyse du taux des cadres et du taux d'ouvriers en 2007 : 
 
-- Proposer une analyse de la distribution des cadres, des ouvriers, du taux de chômage et du revenu médian en 2007 dans la métropole parisienne.
-- Commenter l'évolution entre 1999 et 2007 de la population des cadres et des ouvriers.
-- Commenter l'évolution de la densité entre 1936 et 2008.
+1. En utilisant les indicateurs statistiques de position et de dispersion, et prenant soin de visualiser et commenter la forme de la distribution, comparez la distribution de ces deux catégories socio-professionnelles avec le vocabulaire approprié : quelles sont leurs spécificités respectives ? Quelle CSP introduit le plus de différentiation dans l'espace francilien ? 
 
-Postez votre script (NOM_Prenom.R) et vos 6 cartes sur Slack **avant dimanche soir**. 
+2. Cartographier ces deux CSP en justifiant la méthode de discrétisation utilisée et la palette de couleur employée. 
+
+3. Commentez et comparer brièvement les deux cartes. 
+
+B. Commenter la distribution statisique du revenu médian et du taux de chômage en 2007. Puis proposez deux cartes, en précisant et justifiant la méthode de discrétisation choisie. 
+
+C. Calculez, par un indice, *l'évolution* entre 1999 et 2007 du taux de cadre et d'ouvriers par commune. Commentez la distribution de ces deux indices, puis cartographier là. 
+
+Postez votre script (NOM_Prenom.R) et vos 5 cartes sur Slack **avant dimanche soir**. 
 
 
 ---
