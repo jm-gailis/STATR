@@ -1,0 +1,26 @@
+"0","idf_sf <- st_read(dsn = ""data/parispc_com.shp"", 
+                  crs = 2154, 
+                  stringsAsFactors = F)
+"
+"1","Reading layer `"
+"1","parispc_com"
+"1","' from data source `"
+"1","C:\Users\Julien M\Dropbox\ENS\Cours\FormationR\statsmappingwithR\statsmappingwithR\02_SpatialData\data\parispc_com.shp"
+"1","' using driver `"
+"1","ESRI Shapefile"
+"1","'"
+"1","
+"
+"1","Simple feature collection with 143 features and 18 fields"
+"1","
+"
+"1","geometry type:  POLYGON
+"
+"1","dimension:      XY
+"
+"1","bbox:           "
+"1","xmin: 637307 ymin: 6843303 xmax: 671686 ymax: 6879253"
+"1","
+"
+"1","projected CRS:  RGF93 / Lambert-93
+"
