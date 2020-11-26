@@ -1,0 +1,992 @@
+---
+title: "Classer, filtrer"
+subtitle: "Ségrégation urbaine et financiarisation <br> du marché immobilier au Cap"
+author: "Julien Migozzi<br><span style = 'font-size: 70%;'>ENS - Département de Géographie <br> UMR Géographie-Cités et UMR PACTE </span>"
+institute: '<a href="http://twitter.com/JulienMigozzi"> <i class="fa fa-twitter fa-fw"></i>&nbsp; JulienMigozzi</a>     <a href="mailto:julien.migozzi@ens.psl.eu"><i class="fa fa-paper-plane fa-fw"></i>&nbsp; julien.migozzi@ens.psl.eu</a><br>'
+date: "23/11/2020"
+output:
+  xaringan::moon_reader:
+    #yolo: true
+    # css: ["rutgers-fonts"]
+    # css: ["rutgers", "rutgers-fonts"]
+    # css: [default, metropolis, metropolis-fonts]
+    # css: ["default", "default-fonts", "hygge"]
+    css: example.css
+    # chakra: remark-latest.min.js
+    lib_dir: libs
+    nature:
+      titleSlideClass: ["left", "middle"]
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+    includes:
+      in_header: header.html  
+    seal: false 
+editor_options: 
+  
+  chunk_output_type: console
+---
+class: title-slide-custom
+
+```{r setup, include=FALSE}
+
+setwd("C:/Users/Julien M/Dropbox/Data These")
+library(tidyverse)
+library(knitr)
+library(kableExtra)
+library(sf)
+library(spData)
+library(mapview)
+library(tmap)
+library(cartography)
+library(viridis)
+library(showtext)
+library(rcartocolor)
+library(RColorBrewer)
+library(hrbrthemes)
+
+# load("Census Comparaison/results/AllCensus_DF_SF_WithIncomes.RData")
+load("Census Comparaison/results/AllCensus_All_Units_DF_SF.RData")
+
+
+#vecteurs ----
+
+race <- c("White", "Black", "Coloured", "IndianAsian")
+race_pct <- paste0(race, "_Pct")
+tenure <- c("Owned", "OwnedNotPaid", "Rented", "RentFree")
+tenure_pct <- paste0(tenure, "_Pct")
+incomes <- rep("HAIB", 12)
+nb <- seq(1, 12, 1)
+incomes <- paste0(incomes, nb)
+incomes_pct <- paste0(incomes, "_Pct")
+
+variables <- c(race_pct, tenure_pct)
+
+
+# Prendre carte ajustée
+
+map2011 <- st_read("Census 2011/Shapefiles/CT_SP_UTM_2011_MacassarAdjusted.shp", crs = 22234)
+map2011$SP_Code <- as.character(map2011$SP_CODE)
+map2011$SP <- as.character(map2011$SP_NAME)
+map2011$MarketArea <- as.character(map2011$MarketArea)
+map2011$GroupArea <- as.character(map2011$GroupArea)
+map2011$MP_NAME <- as.character(map2011$MP_NAME)
+map2011 <- map2011 %>% select(SP_Code)
+
+Census2011 <- Census2011 %>% st_set_geometry(NULL) %>% merge(map2011, .)
+# Create data.frame en sélectionnant le Census----
+
+# `%not_in%` <- purrr::negate(`%in%`)
+class(Census2011$SP_Code)
+
+mysf <- Census2011 %>% 
+# mutate(Area = st_area(Interpol_1996)/1000000) %>% 
+filter(GroupArea %in% myplaces) %>%
+filter(!SP_Code %in% atlantis11)%>%
+# filter(!SP_Code %in% SP_Eliminer2001_for2011)%>%
+filter(!SP_Code %in% SP_Eliminer2011)%>%
+filter(Pop >99) %>%
+  mutate(ZoningLabel = ifelse(GroupArea == "WhiteArea", "Formerly white-only areas", 
+ifelse(GroupArea == "Post", "Post-apartheid areas", 
+ifelse(GroupArea == "ColouredArea",
+"Coloured townships",
+ifelse(GroupArea == "BlackArea", "Black townships",
+ifelse(GroupArea == "MixedArea", "Formerly white-only areas", "NA")))))) %>% 
+mutate(ZoningLabel = fct_relevel(ZoningLabel, "Black townships", "Coloured townships", "Post-apartheid areas",
+"Formerly white-only areas")) %>%
+select(SP, SP_Code, race, race_pct, everything())
+
+windowsFonts(Lato=windowsFont("Lato")) 
+
+```
+
+
+<font size = 7> .center[Classer, filtrer] </font>
+
+.center[Ségrégation urbaine et financiarisation <br> du marché immobilier au Cap]
+<br>
+
+```{r,echo = F, out.height="60%"}
+include_graphics("img/Couv.png")
+```
+
+### <span style = 'font-size: 70%;'> Julien Migozzi <br> <span style = 'font-size: 70%;'>Ecole Normale Supérieure ; UMR Géographie-Cités et UMR PACTE </span> <br> <span style = 'font-size: 70%;'> <a href="http://twitter.com/JulienMigozzi"> <i class="fa fa-twitter fa-fw"></i>&nbsp;JulienMigozzi</a> <a href="mailto:julien.migozzi@ens.psl.eu"><i class="fa fa-paper-plane fa-fw"></i>&nbsp; julien.migozzi@ens.psl.eu</a><br>
+
+---
+## Feuille de route
+
+<style>
+p.caption {
+  font-size: 1em;
+}
+
+</style>
+
+
+
+
+
+### Questions, objets et méthodes de recherche .tiny[ [20 minutes] ]
+
+- La métropole sud-africaine : émergence et ségrégation
+  
+--
+
+- Le marché immobilier : financiarisation et stratification sociale
+  
+--
+
+- Méthode mixte 
+
+<br>
+
+--
+### Résultats .tiny[ [25 minutes] ]
+
+- Les structures du marché
+  - Un marché numérisé : une économie de plateformes ;
+  - Deux vagues de financiarisation ;
+  
+--
+
+- Marché, ségrégation et stratification :
+  - Crédit et changement urbain ; 
+  - La classe moyenne : une *classe filtrée*
+  
+
+---
+class: inverse, center
+
+
+# Le Cap 
+## ville post-apartheid, métropole émergente
+
+
+```{r, echo = F, out.height="100%", out.width="120%", fig.cap="Le front urbain nord. J. Migozzi, 2018"}
+include_graphics("img/Couv.png")
+```
+
+
+---
+### Une métropole de 4,5 millions d'habitants en croissance
+  
+
+.pull-left[
+```{r, echo = F, fig.align="center", out.width="140%", out.height="160%"}
+include_graphics("img/Race_Stock_1991_2016.png")
+```
+]
+
+.pull-right[
+```{r, echo = F, fig.align="center", out.width="120%", out.height="120%", warning=F}
+include_graphics("img/Race_Pct_1991_2011_AllUNITS.png")
+```
+]
+
+---
+class: middle, center
+
+### Une ville post-apartheid
+
+```{r, eval = T, echo = F, fig.align="center", out.width="100%"}
+mapview(mysf %>% select(ZoningLabel), zcol = "ZoningLabel", burst = T)
+```
+
+
+---
+### Forte ségrégation raciale
+
+
+```{r, echo = F, fig.align="center", out.width="95%", out.height="90%"}
+include_graphics("img/White.png")
+```
+
+---
+### Forte ségrégation raciale
+
+
+```{r, echo = F, fig.align="center", out.width="95%", out.height="90%"}
+include_graphics("img/Black.png")
+```
+
+---
+### Forte ségrégation raciale
+
+
+```{r, echo = F, fig.align="center", out.width="95%", out.height="90%"}
+include_graphics("img/Coloured.png")
+```
+
+<!-- ] -->
+
+<!-- .pull-right[ -->
+<!-- ```{r, echo = F, fig.align="center", out.width="120%", out.height="120%", warning=F} -->
+<!-- include_graphics("img/Coloured.png") -->
+<!-- ``` -->
+<!-- ] -->
+
+
+
+---
+### Émergence métropolitaine : changement urbain
+
+
+  - Une ville globale de second rang : 
+  
+      - Capitale mondiale du design en 2014 ; 
+      - Coupe du monde en 2010 ; 
+      - Capitale touristique en Afrique. 
+
+---
+### Émergence métropolitaine : changement urbain
+
+  - Des grands projets urbains
+    
+.pull-left[
+![UU](https://magazine.bellesdemeures.com/sites/default/files/styles/manual_crop_735x412/public/article/image/zeit_museum_le_cap.jpg?itok=44xQfGPA)
+]
+
+.pull-right[
+![UU](https://www.capetownetc.com/wp-content/uploads/2019/06/Screen-Shot-2019-06-10-at-4.02.29-PM.png)
+]
+
+---
+### Changement social : essor d'une "nouvelle classe moyenne"
+
+<br>
+
+.pull-left[.small["We have seen a rapidly emerging African elite and urban middle class, which have changed the economic landscape (...) the recent property boom has been attributed to the African middle class."] .tiny[(Hurwitz, 2007)]
+]
+
+.pull-right[
+  
+```{r, echo = F, fig.align="center", out.width = "60%", out.height="50%"}
+include_graphics("img/Southall.PNG")
+```
+]
+
+--
+
+<br><br>
+
+.center[.content-box-blue[Un groupe social de consommateurs, mais une *classe* ?]]
+
+---
+### Changement social : inégalités raciales et sociales 
+
+.center[Une distribution des revenus inégalitaire et racialisée]
+
+<br>
+
+```{r, echo = F, fig.align="center", out.width = "80%", out.height="50%"}
+include_graphics("img/Census2011_2011_Income_Race_Stock_Adjusted.png")
+```
+
+---
+### Changement social et changement urbain en AFS
+
+
+<br> <br>
+
+.center[.content-box-red["*A shift from race to class as the basis of segregation*" .tiny[(Seekings & Natrass, 2005)]]]
+
+<br> <br>
+
+--
+
+.center[**Le marché immobilier : un vecteur de changement**]
+
+<br> 
+- Maintien et reproduction de la ségrégation raciale ;
+<br> <br>
+- "*Transformative market forces*".tiny[(Schensul & Heller, 2011)]
+
+--
+
+<br>
+
+.center[.content-box-blue[Quels effets sociaux et spatiaux du marché et de l'émergence ?]]
+
+
+---
+class: center, middle, inverse
+
+# Le marché immobilier en Afrique du Sud
+
+## Un objet d'étude négligé 
+
+
+
+```{r, echo = F, out.height="50%", out.width="100%", fig.cap="La une du journal dans le township de Khayelitsha. J. Migozzi, 2017"}
+include_graphics("img/Prop.jpg")
+```
+
+---
+### Etat des lieux
+
+<br>
+
+.center[.content-box-red[Immense littérature sur les *politiques du logement*]]
+
+<br><br>
+
+- Interventionnisme important de l'Etat sud-africain : 
+  - 4 millions de logements construits ;
+  - large panel de subventions pour les plus pauvres ;
+  
+  <br> 
+
+--
+
+- Le crédit : un objet politique
+  - *redlining* pendant le colonialime et l'apartheid ; 
+  - volonté de démocratiser et encourager l'accès au crédit depuis 1994 
+  - conservatisme du secteur bancaire
+
+
+---
+### Des symptômes de reconfiguration
+
+- Croissance des prix et boom immobilier
+
+```{r, echo = F, fig.align="center", out.width="80%"}
+include_graphics("img/GlobalPrices.png")
+```
+
+--
+
+.center[.content-box-blue[Quelles causes ? Quelles conséquences sur la ségrégation ?]]
+
+---
+### Des symptômes de reconfiguration
+
+- Croissance des prix et boom immobilier
+- Titrisation des prêts : l'Afrique du Sud, un marché émergent
+
+<br>
+
+```{r, echo = F, fig.align="center", out.width="60%"}
+include_graphics("img/Sasssen.PNG")
+```
+
+<br>
+
+--
+
+<br><br>
+.center[.content-box-blue[Financiarisation : un impensé en Afrique du Sud]]
+
+---
+### Le marché : des lacunes empiriques 
+
+- Des processus urbains déjà connus et étudiés : 
+
+  - Déségrégation de quelques anciens quartiers blancs .tiny[(années 1990 ->)]
+  - Extension périurbaine et *gated communities* .tiny[(années 2000 ->)]
+  - Gentrification des quartiers centraux .tiny[(années 2010 ->)]
+
+--
+
+<br>
+.center[.content-box-blue[Aucune étude du marché *en soi*]]
+<br>
+
+- Acteurs, pratiques et dispositifs marchands ? 
+  - Aucune étude sur le crédit.
+  - Agences et agents immobiliers : aucune enquête.
+
+--
+
+- Méthodologie limitée : 
+  - Travaux surtout qualitatifs .tiny[(Butcher, 2018)] 
+  - Travaux quantitatifs datés et partiels : 
+        - données du marché ignorées ;
+        - focus sur ségrégation raciale > ségrégation économique.
+
+---
+### Le marché : des lacunes théoriques 
+
+
+- Approche binaire de la ville et du marché : *Tale of two cities*, *and so what ?*
+  - *gated communities* vs *informal settlements* ; 
+  - marché formel *vs* marché informel.
+
+--
+
+<br>
+
+- Marché et stratification sociale  : 
+  - usage flou et conflictuel du terme de classe ; 
+  - Explique le changement *a posteriori* ; 
+  - classe moyenne : articulation théorique encore lâche.
+
+--
+
+<br>
+.center[.content-box-blue[Le marché, une boite noire de la recherche]]
+<br>
+
+
+---
+### Des propositions pour étudier marché, stratification et ségrégation
+
+
+<br>
+
+- Géographie économique :
+
+  - "*Actually existing markets*".tiny[(Peck, 2012)]
+  - Le marché du crédit immobilier .tiny[(Aalbers, 2011)]
+  - Financiarisation : vecteur d'inégalités sociales, production de l'espace urbain .tiny[(Langley, 2009, Fields, 2019)]
+
+--
+
+<br><br>
+.center[.content-box-blue[Littérature nord-occidentale (US, UE)]]
+<br><br>
+
+.center[.content-box-blue[Economie politique : quid des structures résidentielles ?]]
+
+
+---
+### Des propositions pour étudier marché, stratification et ségrégation
+ 
+  <br>
+
+- Sociologie économique
+ <br> <br>
+
+  - Les dispositifs de marché .tiny[(Callon, 2007)]
+
+  <br>
+--
+
+  - Crédit et stratification sociale : l'économie numérique mesure et note les individus. Le score est une nouvelle forme de capital, qui génère de la classification sociale .tiny[(Fourcade & Headly, 2017; 2013)]
+
+--
+
+ <br> <br>
+
+.center[.content-box-blue[Lien entre ségrégation urbaine et capitalisme numérique ?]]
+
+---
+## Trois objectifs de recherche
+
+<br><br>
+
+--
+
+- Analyser les structures actorielles et spatiales du marché pour comprendre la ségrégation urbaine ;
+<br><br>
+- Comprendre **depuis le marché** les mécanismes de stratification pour identifier et théoriser la "classe moyenne" ;
+<br><br>
+- Associer enquête de terrain et méthodes quantitatives pour travailler à l'échelle métropolitaine et infra-urbaine.
+
+---
+## Une méthode mixte
+
+<br>
+
+.pull-left[ **Méthodes qualitatives** : 
+- Enquête de terrain de 18 mois
+- 90 entretiens avec les acteurs du marché
+- photographie, transect urbain
+]
+
+.pull-right[ **Méthodes qualitatives** : 
+- Construction d'une base de données de 900 000 transactions
+- Harmonisation des données du recensement
+- cartographie, analyse spatiale et multivariée
+]
+
+---
+### Enquête de terrain
+
+
+```{r, echo = F, out.width="100%", fig.align="center"}
+include_graphics("img/Zolam.PNG")
+```
+
+---
+### Cartographier le marché : une base de données inédite
+
+- Archives des offices notariaux de la Municipalité de 1612 à 2017
+
+--
+
+- Nettoyage et jointure spatiale : 
+  - reconstitution du zonage d'apartheid ;
+  - de 35 millions de titre de propriété à 900 000 transactions 
+
+--
+
+- Base de données *Cape Town Transactions* : 
+  - Date 
+  - Prix
+  - Crédit (montant, banque)
+  - Nom et ID de l'acheteur
+  - Caractéristiques du logement
+  
+--
+
+- Méthodes : 
+  - analyse spatiale (interpolation) ; 
+  - analyse statistique multivariées ; 
+
+--
+
+- Utilisation du logiciel R et de QGIS
+  - logiciels open source ; 
+  - reproductibilité.
+
+---
+class: center, middle, inverse
+
+# Résultats
+
+---
+## Quatre résultats
+
+<br><br>
+- Le marché numérisé : une économie de plateformes 
+<br><br>
+- Deux vagues de financiarisation 
+<br><br>
+- Géographie des prix et du crédit : ségrégation contemporaine 
+<br><br>
+- Marché et stratification : la classe moyenne, une classe filtrée 
+
+---
+class: center, middle
+
+## Une économie de plateformes
+
+### La transaction, un processus numérisé
+
+
+---
+### Le marché numérisé
+
+<!-- j'ai voulu regarder comment se déroule une transaction -->
+
+```{r, echo = F, out.width="80%", fig.align="center"}
+include_graphics("img/FLUX_French.png")
+```
+
+
+---
+### Le *credit scoring* : un dispositif de marché central
+
+
+- Méthode statistique qui consiste à classer et noter les individus selon une échelle de risque.
+
+- On évalue les **comportements financiers** pour prédire le risque d'impayés.
+
+<br>
+
+```{r, echo = F, fig.align="center", out.width="80%"}
+include_graphics("img/CreditScoringPeople.PNG")
+```
+
+
+---
+### Le *credit scoring* : un dispositif de marché central
+
+
+- Bureaux de crédit sud-africain extraient et revendent des données : 
+  - grandes enseignes ; 
+  - comptes bancaires ; 
+  - tribunaux ; 
+  - données des recensements... 
+
+--
+
+<br>
+- Un "filet informationnel" .tiny[(Fourcade et Healy, 2017)] tissé sur le temps long : l'Etat biométrique .tiny[(Breckeridge, 2005)].
+
+--
+
+<br>
+- Dispositif de classification automatique adopté : 
+  - sur le marché du prêt immobilier, par l'industrie bancaire.
+  - sur le marché locatif, par les agents immobiliers
+<br>
+---
+### Le marché immobilier : une industrie de la donnée spatiale
+
+- Cadastre : dispositif colonial ancien : 
+  - un identifiant pour chaque logement  
+  - numérisation (municipalité et taxes foncières)
+
+--
+<br>
+- Des plateformes, comme l'entreprise *Lightstone*, aspirent les données des offices notariaux : 
+  - caractéristiques du logement ; 
+  - montant de la vente ; 
+  - montant du crédit.
+  
+--
+
+- Plateformes utilisées par les agents, les banques et les promoteurs : 
+
+  - Evaluation automatique de la valeur immobilière de chaque logement.
+  - Evaluation des quartiers
+  - Prédiction d'évolution des valeurs immobilières. 
+  
+  
+
+<!-- He was like a wind -->
+
+
+---
+### Le marché : un flux de données pour classer
+
+```{r, echo = F, out.width="80%", fig.align="center"}
+include_graphics("img/FLUX_French.png")
+```
+<br><br>
+.center[.content-box-red[Classer les individus, les logements, les quartiers]]
+
+---
+class: center, middle
+
+# Deux vagues de financiarisation
+
+## Cycles et structures du marché
+
+---
+### Première vague : inflation immobilière
+
+
+```{r, echo = F, out.width="80%", fig.align="center"}
+include_graphics("img/CATT_Nominal_Real_Prices.png")
+```
+
+---
+### Première vague : inflation immobilière 
+
+
+```{r, echo = F, out.width="80%", fig.align="center"}
+include_graphics("img/Prices_Smooth_250m_in_2003.png")
+```
+
+---
+### Première vague : inflation immobilière 
+
+
+```{r, echo = F, out.width="80%", fig.align="center"}
+include_graphics("img/Prices_Smooth_250m_in_2007.png")
+```
+
+---
+### Première vague : inflation immobilière
+
+
+```{r, echo = F, out.width="80%", fig.align="center"}
+include_graphics("img/Prices_Smooth_250m_in_2016.png")
+```
+
+---
+### Première vague : un boom du crédit facile
+
+<br><br>
+
+.pull-left[
+.scriptsize["So banks' lending criteria wasn't... They were just dishing out money to everybody" .right[-- Promoteur]
+
+"You would be walking into a bank, and say :
+"*Hi, I'm Mr Jones, I work for Mr Sally, here is my payslip, please give me a loan*".
+Litteraly. No bank statements needed. I remember those days ! It was easy. That's why I could sell 29 properties in one month" .right[-- Agent]]
+] 
+
+.pull-right[
+```{r, echo = F, out.width="100%", fig.align="center"}
+include_graphics("img/SARM_mortgagesvalue.jpg")
+```
+]
+
+<!-- .pull-left[.scriptsize["You would be walking into a bank, and say "*Hi, I'm Mr Jones, I work for Mr Sally, here is my payslip, please give me a loan*". -->
+
+<!-- Litteraly. No bank statements needed. I remember those days ! It was easy. That's why I could sell 29 properties in one month" .right[-- Agent]] -->
+<!-- ] -->
+
+
+---
+### Première vague : inertie des valeurs immobilières 
+
+```{r, echo = F, out.width="80%", fig.align="center"}
+include_graphics("img/MedianPrice_GAA.png")
+```
+
+---
+### Première vague : deux innovations techniques 
+
+- Essor de la titrisation
+
+```{r, echo = F, out.width="80%", fig.align="center"}
+include_graphics("img/securitization_2001_2019.png")
+```
+
+--
+
+- Essor des courtiers en crédit
+
+---
+### Des structures de marché reconfigurées
+
+<br><br>
+- Généralisation du recours au crédit ; 
+<br><br>
+- Nouvelle loi : *National Credit Act*, 2007 
+<br><br>
+- Généralisation du **credit scoring**.
+
+---
+### Deuxième vague : récession économique
+
+.center[**Une société endettée** .tiny[(James, 2014)]]
+
+<br>
+
+```{r, echo = F, out.width="40%", fig.align="center"}
+include_graphics("img/Drowning.png")
+```
+
+---
+### Deuxième vague : le crédit en temps de dette
+
+.center[**Le crédit : un produit bancaire sélectif**]
+
+<br>
+
+.pull-left[
+- Minimum 12 000 rands de revenus : 20% de la population 
+- Des taux de refus très élevés
+
+<br><br>
+
+.center[*Banks. They want your DNA*" .tiny[Agent]]
+
+<br><br>
+
+- Inégalités raciales et spatiales : 
+  - Centre-ville, Southern Suburbs : 0%
+  - Khayelitsha, Blue Downs : 70%
+]
+
+.pull-right[
+```{r, echo = F, out.width="100%", fig.align="center"}
+include_graphics("img/DSCF4330.JPG")
+```
+]
+
+---
+### Deuxième vague : arivée d'investisseurs sur le locatif
+
+
+- 2012 : introduction des *Real Estate Investment Trust* au JSE ;
+- 2015 : premier REIT résidentiel en Afrique du Sud
+--
+
+- Acquisition de portfolios locatifs dans les grandes aires métropolitaines ; 
+- Sélection des locataires par le *credit scoring*
+  - minimiser les risques de vacances ; 
+  - réduire le risque d'impayés
+
+<br>
+
+---
+### Deuxième vague : arivée d'investisseurs sur le locatif
+
+
+.center["*We don't take people under 622*" .tiny[Gestionnaire]]
+
+
+```{r, echo = F, out.width="40%", fig.align="center"}
+include_graphics("img/Payprop_BadTenant.png")
+```
+
+---
+### La ville financiarisée : extension de la titrisation
+
+
+```{r, echo = F, out.width="80%", fig.align="center"}
+include_graphics("img/Map_RMBS_PricesSmooth_SP.png")
+```
+
+---
+### La ville financiarisée : une titrisation racialisée
+
+
+```{r, echo = F, out.width="80%", fig.align="center"}
+include_graphics("img/Map_RMBS_Price_SP.png")
+```
+
+
+---
+### La ville financiarisée : nouvelles formes urbaines
+
+```{r, echo = F, out.width="80%", fig.align="center", fig.cap="Burgundy Estate"}
+include_graphics("img/BE2018.jpg")
+```
+
+
+---
+### La ville financiarisée : nouvelles formes urbaines
+
+
+```{r, echo = F, fig.show= "hold", out.width="55%", fig.align="center"}
+include_graphics("img/IMG_1727.JPG")
+include_graphics("img/IMG_2163.JPG")
+```
+
+
+
+
+---
+class: center, middle
+
+# Géographie du crédit et ségrégation
+
+---
+### Ségrégation en recul
+
+
+```{r, echo = F, out.width="80%", fig.align="center"}
+include_graphics("img/IndiceSegregationDuncan_91_2011.png")
+```
+
+---
+### Une diversité raciale locale en augmentation 
+
+.center[Indice local d'entropie]
+.center[0 = aucune diversité ; 1,2 = diversité maximale]
+<br>
+
+```{r, echo = F, out.width="80%", fig.align="center"}
+include_graphics("img/Boxplot_Entropy_1991_2011.png")
+```
+
+
+---
+### Prix et crédit : une relation structurante de l'espace urbain
+
+```{r, echo = F, out.width="90%", fig.align="center"}
+include_graphics("img/Regression_MedianBond20122016_MedianPrice2016_SP2011.png")
+```
+
+
+---
+### Géographie du crédit  : différents régimes d'achat
+
+.center[Ratio Prix-Crédit]
+
+.center[0 = aucun crédit ; 1 = financement par le crédit]
+
+```{r, echo = F, out.width="85%", fig.align="center"}
+include_graphics("img/CredittoPrice_Q4_Smooth_500m_2012_2016_Viridis.png")
+```
+
+---
+### Prix et diversité : ségrégation et déségrégation
+
+```{r, echo = F, out.width="90%", fig.align="center"}
+include_graphics("img/Regression_ShannonRace_Medianprice_2011.png")
+```
+
+
+---
+### Les structures spatiales de la diversité
+
+.center[Le crédit, une fenêtre de déségrégation]
+
+```{r, echo = F, out.width="85%", fig.align="center"}
+include_graphics("img/MapClusterShannon1996_2011.png")
+```
+
+---
+class: center, middle
+
+# Marché et stratification sociale
+
+## Les mécanismes de filtrage
+
+
+---
+### Deux mécanismes de filtrage
+
+.center[Abordabilité du logement : relation entre prix et revenus]
+
+```{r, echo = F, out.width="80%", fig.align="center"}
+include_graphics("img/Map_PriceToIncome_SSA_White.png")
+
+```
+
+---
+### Deux mécanismes de filtrage
+
+.center[Abordabilité du logement : relation entre prix et revenus]
+
+```{r, echo = F, out.width="80%", fig.align="center"}
+include_graphics("img/Map_PriceToIncome_SSA_Black.png")
+```
+
+
+---
+### Deux mécanismes de filtrage
+
+.center[Le scoring : filtre disciplinaire des comportements financiers]
+
+
+```{r, echo = F, out.width="60%", fig.align="center"}
+include_graphics("img/FB.png")
+```
+
+---
+### Deux mécanismes de filtrage
+
+.center[Le crédit : une géographie de la classe]
+.center[Diversification des trajectoires résidentielles]
+
+<br>
+
+```{r, echo = F, out.width="100%", fig.align="center"}
+include_graphics("img/KHA.png")
+```
+
+---
+### Géographie de l'émergence 
+
+.pull-left[
+```{r, echo = F, out.width="100%", fig.align="center"}
+include_graphics("img/CT_Typo.PNG")
+```
+]
+
+.pull-right[
+```{r, echo = F, out.width="100%", fig.align="center"}
+include_graphics("img/Legend.PNG")
+```
+]
+
+<br><br>
+
+
+- Analyse en Composante Princiale sur 39 indicateurs (race, prix, crédit) 
+- Classification Ascendante Hiérarchique sur les 3 premiers axes
+
+
+---
+### La classe moyenne, une classe filtrée
+
+```{r, echo = F, out.width="90%", fig.align="center"}
+include_graphics("img/MC.png")
+```
+
+---
+class: center, middle
+
+# Merci de votre attention !
+
+Présentation créée avec le package R [**xaringan**](https://github.com/yihui/xaringan).
+
