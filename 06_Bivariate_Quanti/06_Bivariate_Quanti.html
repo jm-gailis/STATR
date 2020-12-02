@@ -1,0 +1,870 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Statistiques bivariées</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="J. Migozzi" />
+    <link rel="stylesheet" href="example.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Statistiques bivariées
+## Deux variables quantitatives <br> Statistique et cartographie avec R
+### J. Migozzi
+### Ecole Normale Supérieure
+### 30/11/2020
+
+---
+
+class: inverse, center, middle
+
+# Rappel
+
+
+
+
+
+
+
+
+---
+## De la statistique descriptive à la cartographie 
+
+- Ouvrir, explorer et manipuler des données spatiales sous R ; 
+
+&lt;br&gt;
+
+- Décrire une distribution statistique : 
+  - pour une variable *catégorielle* : 
+      - regarder la **fréquence** avec un tableau de dénombrement ; 
+      - **visualiser** (diagramme en bâton).
+  - pour une variable *quantitative*, regarder : 
+      - les mesures de **position** (moyenne, mediane) et de **dispersion** (variance, écart-type); 
+      - **visualiser** la distribution (histogramme, *boxplot*).
+      - discrétiser.
+
+&lt;br&gt;
+  
+- Adopter les variables visuelles appropriées (*forme, taille, couleur*) ; 
+
+&lt;br&gt;
+
+- Soigner l'habillage de la carte (*titre, légende, source, auteur, date*). 
+
+---
+class: middle, center, inverse
+
+# De l'univarié à l'analyse bivariée
+
+## Vers la modélisation
+
+---
+### Statistiques bivariée
+
+- Analyse et à représentation d'une variable : **statistique univariée**. 
+
+- Indicateurs et visualisation : charpente de la statistique &amp; prélude indispensable à toute cartographie de données.
+
+&lt;br&gt;
+--
+&lt;br&gt;
+
+- Statistique **bivariée** : étude des *relations* entre deux variables, quelles soient qualitatives ou quantitatives. 
+
+--
+
+- La statistique bivariée consiste à analyser la relation entre deux variables, c'est à dire à mesurer comment ces deux variables *covarient*, à identifier des dépendances. 
+
+
+---
+### Vers la modélisation 
+
+- C'est une première étape vers la modélisation : *expliquer*, voire de *prédire* le réel par le biais d'un modèle mathématique résumant la relation entre deux variables. 
+
+
+- Cette modélisation mathématique repose sur : 
+  - une **variable à expliquer**, dite aussi variable dépendante, *target*, *responsable variable*...
+  - une **variable explicative**, dite aussi variable indépendante, *regressor*, *covariate*, *feature*...
+
+--
+  
+- Expliquer *Y* en fonction de *X* revient à proposer une équation : 
+
+`$$y = f(x)$$`
+---
+### Modèle : mesurer une relation statistique
+
+
+- Il s'agit de confronter des données empiriques (collectées sur le terrain, acquises auprès d'un fournisseur) à des données théoriques, produites par un modèle, puis déterminer l'importance de l'**écart** entre données empiriques et théoriques.
+
+- Plus l'écart entre données et modèle est petit, plus la relation entre les deux variables est forte, *sans que l'on puisse parler de causalité*. On quantifie seulement l'intensité de la relation. 
+
+
+---
+### Variables, relations et choix du modèle
+
+Le modèle à employer pour étudier une relation dépend du type de variables.
+
+&lt;br&gt;
+
+&lt;img src="img/Bivar.png" width="40%" style="display: block; margin: auto;" /&gt;
+.center[ .tiny[Graphique inspiré de [Hadrien Commenges](https://gitlab.huma-num.fr/hcommenges/cours_statcomplet)]]
+
+--
+
+
+   &lt;br&gt; 
+.center[.content-box-red[Choix des variables et du modèle : question scientifique]]
+  &lt;br&gt;
+  
+  
+---
+class: center, middle, inverse
+
+# Analyser une relation bivariée
+
+## Visualisation, covariance corrélation
+
+---
+### Visualisation
+
+On utilise un *scatter plot*, ou nuage de points, pour visualiser la relation entre deux variables quantitatives continues. 
+
+
+```r
+plot(idf_sf$POUV07, idf_sf$PCAD07)
+```
+
+&lt;img src="06_Bivariate_Quanti_files/figure-html/unnamed-chunk-2-1.png" width="55%" style="display: block; margin: auto;" /&gt;
+
+---
+### Visualisation
+
+Le nuage de points permet de déterminer la relation : 
+
+- l'**intensité**  : *forte*, *faible*, *nulle.*
+- la **forme**  : *linéaire*, *non-linéaire*.
+- le **sens** : *positive*, *négative.* 
+
+&lt;br&gt;
+
+&lt;!-- Selon la forme de la relation observée, on ne fera pas les mêmes hypothèses et on n'utilisera pas les mêmes outils de mesure. --&gt;
+
+&lt;img src="img/Relations.PNG" width="70%" style="display: block; margin: auto;" /&gt;
+.center[ .tiny[Graphique inspiré de [Hadrien Commenges](https://gitlab.huma-num.fr/hcommenges/cours_statcomplet)]]
+
+---
+## Mesurer la relation : covariation et covariance
+
+- On dit qu'il existe une relation entre *X* et *Y* si : 
+  - les valeurs de *X* dépendent des valeurs de *Y*  ou 
+  - si les valeurs de *Y* dépendent des valeurs de *X.*
+
+&lt;br&gt;
+- Deux variables entretiennent une **relation linéaire** entre elles si la variation relative de l'une d'entre elles entraîne une variation relative constante de l'autre .tiny[(O. Martin, 2014)].
+
+&lt;br&gt;
+
+- La **covariance** est une valeur qui permet de connaître dans quelle mesure les variables d'une série statistique évoluent ensemble.
+
+---
+## La covariance
+
+.center[La **covariance** est la moyenne du produit des écarts.]
+
+
+`$$cov_{x,y}=\frac{\sum_{i=1}^{N}(x_{i}-\bar{x})(y_{i}-\bar{y})}{N-1}$$`
+
+où *N* est l'effectif de la population, `\(\bar{x}\)` la moyenne de *x* et `\(\bar{y}\)` la moyenne de *y*.
+
+--
+
+&lt;br&gt;
+
+**Exercice** : calculez, à l'aide de R, la covariance du taux d'ouvriers en 2007 (x) et 
+du taux de cadres en 2007 (y) : 
+
+- calculez les écarts à la moyenne ; 
+- calculez le produit des écarts ; 
+- calculez la somme du produit des écarts ; 
+- calculez la covariance
+
+
+
+---
+### Solution 
+
+Manuellement, en codant toutes les étapes : 
+
+
+```r
+xdev &lt;- idf_sf$POUV07 - mean(idf_sf$POUV07) #écart à moyenne
+ydev &lt;- idf_sf$PCAD07 - mean(idf_sf$PCAD07)
+
+xdev_ydev &lt;- xdev * ydev #produit
+
+sum_xdev_ydev &lt;- sum(xdev_ydev) #somme produit
+
+cov_xy &lt;- sum_xdev_ydev / (nrow(idf_sf) - 1) # moyenne
+cov_xy &lt;- sum_xdev_ydev / (143 - 1) # nrow(idf_sf) = 143
+
+cov_xy
+```
+
+```
+## [1] -107.7118
+```
+
+---
+### Solution 
+
+Avec le *tidyverse* : 
+
+
+```r
+idf_sf %&gt;% st_set_geometry(NULL) %&gt;%
+  mutate(EcartOuv = POUV07 - mean(POUV07), 
+        EcartCad = PCAD07 - mean(PCAD07)) %&gt;%
+    mutate(Produit = EcartOuv*EcartCad) %&gt;%
+summarise(SommeProduit = sum(Produit)) %&gt;%
+summarise(Cov = SommeProduit / (nrow(idf_sf) - 1)) 
+```
+
+```
+##         Cov
+## 1 -107.7118
+```
+
+Avec R et la fonction *cov*() : 
+
+```r
+cov(idf_sf$POUV07, idf_sf$PCAD07)
+```
+
+```
+## [1] -107.7118
+```
+
+
+---
+### De la covariance à la corrélation
+
+La covariance n'a pas beaucoup de signification en elle-même puisqu’elle dépend des unités de mesure.  
+
+&lt;!-- - La covariance se calcule avec des écarts à la moyenne : ne dépend donc pas de l’ordre de grandeur de la variable. --&gt;
+&lt;!-- - La covariance est une moyenne (somme rapportée à l’effectif) : ne dépend donc pas du nombre d’observations. --&gt;
+&lt;!-- - La covariance dépend de la variation (dispersion) des deux variables autour de la moyenne : on neutralise cet effet en la rapportant au produit des écart-types des deux variables.  --&gt;
+
+- On *standardise la covariance* en la rapportant au produit des écarts-types. La formule est la suivante : 
+
+`$$R = \frac{\text{cov}(X,Y)}{\sigma_x \sigma_y}$$`
+où `\(\sigma_y\)` est l'écart type de *y*, soit la racine carré de la variance de *y.*
+
+- *R* est dit coefficient de Bravais-Pearson, coefficient de Pearson, ou encore **coefficient de corrélation**.
+
+---
+## Les coefficients de corrélation : Pearson
+
+
+- Le coefficient de Pearson permet de détecter la présence ou l'absence d'une relation linéaire entre deux caractères quantitatifs continus.
+
+&lt;br&gt;
+
+- Il **varie entre -1 et +1**. 
+
+&lt;br&gt;
+
+- Son interprétation est la suivante :
+
+  - R proche de 0 : pas de relation linéaire entre *X* et *Y*.
+  - R tends vers - 1 :  il existe une forte **relation linéaire négative** entre *X* et *Y*.
+  - R tends vers 1 : il existe une forte **relation linéaire positive** entre *X* et *Y*.
+
+
+---
+## Les coefficients de corrélation : Spearman
+
+- Ce coefficient de **corrélation de rang** examine s'il existe une relation entre le rang des observations pour deux caractères *X* et *Y*.
+
+&lt;br&gt;
+
+- Il est préférable au coefficient de Pearson lorsque les distributions *X* et *Y* sont dissymétriques et/ou comportent des valeurs exceptionnelles. 
+
+&lt;br&gt;
+
+- Il est fondé sur l'étude de la **différence des rangs** entre les attributs des individus pour les deux caractères *X* et *Y*.
+
+&lt;br&gt;
+
+- Il **varie entre -1 et +1** : même signification que Pearson.
+
+---
+## Les coefficients de corrélation 
+
+
+&lt;img src="img/Coeff.PNG" width="40%" style="display: block; margin: auto;" /&gt;
+.center[.tiny[Source : [Julien Barnier](https://juba.github.io/tidyverse/04-bivarie.html#calcul-dindicateurs)]]
+
+---
+## Bilan des coefficients
+
+&lt;br&gt;
+&lt;br&gt;
+
+.center[.content-box-blue[Le signe de *R* (+/-) indique le **sens** de la relation]]
+&lt;br&gt;&lt;br&gt;
+.center[.content-box-blue[La valeur absolue de *R*  indique l'**intensité** de la relation]]
+&lt;br&gt;
+
+.center[Intensité de la relation :]
+
+.center[capacité à prédire les valeurs de *Y* en fonctions de celles de *X*.]
+
+---
+### Corrélation : application sur R
+
+&lt;br&gt;
+
+On utilise la fonction *cor()*. Cette fonction s'applique sur deux variables, en précisant la méthode souhaitée par l'argument *method*.
+
+
+### Pearson
+
+```r
+cor(data.frame$X, data.frame$Y, 
+    method = "pearson")
+```
+
+### Spearman
+
+
+```r
+cor(data.frame$X, data.frame$Y, 
+    method = "spearman")
+```
+
+---
+### Matrice de corrélation
+
+- Pour plusieurs variables !
+
+- Plusieurs packages existent : 
+  - [corrplot](https://cran.r-project.org/web/packages/corrplot/vignettes/corrplot-intro.html) ; 
+  - [corrr](https://cran.r-project.org/web/packages/corrr/vignettes/using-corrr.html), compatible avec le *tidyverse*, sorti le 24 novembre 2020. 
+  
+ 
+---
+class: inverse, middle, center
+
+# Visualisation : un détour par *ggplot2*
+
+## La grammaire des graphiques
+
+---
+### Le package ggplot
+
+1 - Sélectionner un objet 
+
+
+```r
+ggplot(objet)
+```
+
+---
+### Avec ggplot : aes()
+
+2 - Définir les variables qui déterminent les paramètres esthétiques (axe des x, axe des y, couleur, forme...) 
+
+
+```r
+ggplot(objet, aes(Var1, Var2)) 
+```
+
+&lt;br&gt;&lt;br&gt;
+
+.center[.content-box-blue[*Tidyverse* : ni guillemet, ni $ !]]
+
+---
+### Avec ggplot : les *geom_*
+
+3 - Choisir une forme géométrique 
+
+&lt;br&gt;
+
+.center[Ici, geom_point, car on veut un *scatter plot*]
+
+&lt;br&gt;
+
+.left-code[
+
+```r
+ggplot(idf_sf, aes(POUV07, PCAD07)) +
+ geom_point() 
+
+# est l'équivalent de :
+
+# plot(objet$Var1, objet$Var2)
+```
+]
+
+.right-plot[
+![](06_Bivariate_Quanti_files/figure-html/plot-label1-out-1.png)&lt;!-- --&gt;
+]
+
+
+---
+### Avec ggplot : theme_()
+
+4 - Changer un thème
+
+.left-code[
+
+```r
+ggplot(idf_sf, aes(POUV07, PCAD07)) +
+  geom_point(size = 4, #taille
+             alpha = 0.5) + #transparence
+  theme_bw(base_size = 24) # black and white
+```
+]
+
+.right-plot[
+![](06_Bivariate_Quanti_files/figure-html/plot-label2-out-1.png)&lt;!-- --&gt;
+]
+
+---
+### Avec ggplot : theme_()
+
+5 - Changer le thème
+
+.left-code[
+
+```r
+library(ggthemes)
+
+ggplot(idf_sf, aes(POUV07, PCAD07)) +
+  geom_point(size = 4) + 
+  theme_wsj() # Wall Street Journak
+```
+]
+
+.right-plot[
+![](06_Bivariate_Quanti_files/figure-html/plot-label3-out-1.png)&lt;!-- --&gt;
+]
+
+---
+### Avec ggplot : labs()
+
+6 - Ajouter habillage
+
+.left-code[
+
+```r
+library(hrbrthemes)
+
+ggplot(idf_sf, aes(POUV07, PCAD07)) +
+  geom_point(size = 4) + 
+  theme_ipsum_rc() + # theme Roboto
+labs(title = "Ségrégation sociale en IDF", 
+ subtitle = "Cadres et ouvriers",
+ y = "% de cadre par commune", 
+ x = "% d'ouvriers par commune",  
+ caption = "Auteur : J. Migozzi. Source : INSEE" 
+ )
+```
+]
+
+.right-plot[
+![](06_Bivariate_Quanti_files/figure-html/plot-label4-out-1.png)&lt;!-- --&gt;
+]
+
+---
+### Avec ggplot : aes(col = )
+
+7 - Jouer sur les variables visuelles : couleur
+
+.left-code[
+
+```r
+ggplot(idf_sf, aes(POUV07, PCAD07, 
+       col = NOM_DEPT)) + # variable pour couleur
+# Notez : l'argument col est DANS
+# l'argument aes() : c'est un paramètre esthéique.
+  geom_point(size = 4) + # taille 4 par défaut
+  theme_ipsum_rc() +
+labs(title = "Ségrégation sociale en IDF", 
+ subtitle = "Cadres et ouvriers",
+ y = "% de cadre par commune", 
+ x = "% d'ouvriers par commune",  
+ caption = "Auteur : J. Migozzi. Source : INSEE" 
+ )
+```
+]
+
+.right-plot[
+![](06_Bivariate_Quanti_files/figure-html/plot-label5-out-1.png)&lt;!-- --&gt;
+]
+
+---
+### Avec ggplot : aes(size = )
+
+7 - Jouer sur les variables visuelles : taille
+
+.left-code[
+
+```r
+ggplot(idf_sf, aes(POUV07, PCAD07, 
+       size = POP2008)) + # Population
+  geom_point() + # Enlever size 
+# la taille va donc varier selon une 
+# variable définie dans les paramètres 
+# aes
+  theme_ipsum_rc() +
+labs(title = "Ségrégation sociale en IDF", 
+ subtitle = "Cadres et ouvriers",
+ y = "% de cadre par commune", 
+ x = "% d'ouvriers par commune",  
+ caption = "Auteur : J. Migozzi. Source : INSEE" 
+ )
+```
+]
+
+.right-plot[
+![](06_Bivariate_Quanti_files/figure-html/plot-label6-out-1.png)&lt;!-- --&gt;
+]
+---
+### Avec ggplot : facet_wrap()
+
+7 - Un plot par variable catégorielle 
+
+.left-code[
+
+```r
+ggplot(idf_sf, aes(POUV07, PCAD07)) +
+geom_point(size = 2) + 
+  theme_ipsum_rc() +
+labs(title = "Ségrégation sociale en IDF", 
+ subtitle = "Cadres et ouvriers",
+ y = "% de cadre par commune", 
+ x = "% d'ouvriers par commune",  
+ caption = "Auteur : J. Migozzi. Source : INSEE") +
+facet_wrap(~ NOM_DEPT) 
+# La fonction facet repète autant de 
+# fois le graphique qu'il y a de
+# modalités dans la variable
+```
+]
+
+.right-plot[
+![](06_Bivariate_Quanti_files/figure-html/plot-label7-out-1.png)&lt;!-- --&gt;
+]
+
+---
+### Avec ggplot : scale_()
+
+8 - Fixer les axes
+
+.left-code[
+
+```r
+ggplot(idf_sf, aes(POUV07, PCAD07)) +
+geom_point(size = 2) + 
+  theme_ipsum_rc() +
+scale_x_continuous(expand=c(0, 0),
+                   limits=c(0, 40)) +
+scale_y_continuous(expand=c(0,0),
+                   limits=c(0, 60)) +
+labs(title = "Ségrégation sociale en IDF", 
+ subtitle = "Cadres et ouvriers",
+ y = "% de cadre par commune", 
+ x = "% d'ouvriers par commune",  
+ caption = "Auteur : J. Migozzi. Source : INSEE") +
+facet_wrap(~ NOM_DEPT)
+```
+]
+
+.right-plot[
+![](06_Bivariate_Quanti_files/figure-html/plot-label8-out-1.png)&lt;!-- --&gt;
+]
+
+---
+### Avec ggplot : label
+
+9 - Mettre des labels ?
+
+.left-code[
+
+```r
+# Pour éviter que les labels 
+# se chevauchent 
+library(ggrepel)
+
+ggplot(idf_sf, aes(POUV07, PCAD07, label = NOM)) +
+geom_point(size = 2) + 
+geom_label_repel(size = 2) +
+  theme_ipsum_rc() +
+scale_x_continuous(expand=c(0, 0),
+                   limits=c(0, 40)) +
+scale_y_continuous(expand=c(0,0),
+                   limits=c(0, 60)) +
+labs(title = "Ségrégation sociale en IDF", 
+ subtitle = "Cadres et ouvriers",
+ y = "% de cadre par commune", 
+ x = "% d'ouvriers par commune",  
+ caption = "Auteur : J. Migozzi. Source : INSEE") +
+facet_wrap(~ NOM_DEPT)
+```
+]
+
+.right-plot[
+![](06_Bivariate_Quanti_files/figure-html/plot-label9-out-1.png)&lt;!-- --&gt;
+]
+
+---
+### Avec ggplot et dplyr
+
+10 - Travailler la lisibilité
+
+.left-code[
+
+```r
+# On peut utiliser les fonctions de 
+# dplyr au sein de ggplot : 
+
+ggplot(idf_sf %&gt;% 
+     filter(NOM_DEPT == "HAUTS-DE-SEINE"), 
+     aes(POUV07, PCAD07, 
+         label = NOM)) +
+geom_point(size = 3) + 
+geom_label_repel(size = 2) +
+  theme_ipsum_rc() +
+scale_x_continuous(expand=c(0, 0),
+                   limits=c(0, 40)) +
+scale_y_continuous(expand=c(0,0),
+                   limits=c(0, 60)) +
+labs(title = "Ségrégation sociale en IDF", 
+ subtitle = "Cadres et ouvriers",
+ y = "% de cadre par commune", 
+ x = "% d'ouvriers par commune",  
+ caption = "Auteur : J. Migozzi. Source : INSEE") +
+theme(axis.title.y = element_text(size=15)) +
+theme(axis.title.x = element_text(size=15))
+```
+]
+
+.right-plot[
+![](06_Bivariate_Quanti_files/figure-html/plot-label10-out-1.png)&lt;!-- --&gt;
+]
+
+---
+### Avec ggplot : geom_boxplot
+
+
+.left-code[
+
+```r
+ggplot(idf_sf, aes(NOM_DEPT, PCAD07, 
+           fill = NOM_DEPT)) + 
+geom_boxplot() +
+theme_ipsum_rc() +
+labs(title = "Ségrégation sociale en IDF", 
+ subtitle = "Pourcentage de cadres par commune",
+ x = "", # texte de légende
+ y = "% de cadre par commune", 
+ caption = "Auteur : J. Migozzi. Source : INSEE") +
+theme(axis.title.y = element_text(size=15)) +
+theme(axis.title.x = element_text(size=15)) +
+theme(legend.position = "none")
+```
+]
+
+.right-plot[
+![](06_Bivariate_Quanti_files/figure-html/plot-label11-out-1.png)&lt;!-- --&gt;
+]
+
+---
+### Avec ggplot : geom_histogramme
+
+
+.left-code[
+
+```r
+ggplot(idf_sf, aes(x = PCAD07)) + 
+geom_histogram(bins = 20) +
+theme_ipsum_rc() +
+labs(title = "Ségrégation sociale en IDF", 
+ subtitle = "Pourcentage de cadres par commune",
+ x = "", # texte de légende
+ y = "Fréquence", 
+ caption = "Auteur : J. Migozzi. Source : INSEE") +
+theme(axis.title.y = element_text(size=15)) +
+theme(axis.title.x = element_text(size=15)) +
+theme(legend.position = "none") +
+  facet_wrap(~NOM_DEPT)
+```
+]
+
+.right-plot[
+![](06_Bivariate_Quanti_files/figure-html/plot-label12-out-1.png)&lt;!-- --&gt;
+]
+
+---
+### Très nombreuses extensions
+
+
+```r
+library(GGally)
+
+ggpairs(idf_sf, columns = c("POUV99", "PCAD99", "NOM_DEPT"), 
+        columnLabels = c("Ouvriers", "Cadre", "Département")) +
+  theme_bw()
+```
+
+&lt;img src="06_Bivariate_Quanti_files/figure-html/unnamed-chunk-12-1.png" width="50%" style="display: block; margin: auto;" /&gt;
+
+---
+### Très nombreux tutoriels et ressources en ligne 
+
+- Le package [esquisse](https://github.com/dreamRs/esquisse) qui permet de charger ses données, créer ses graphiques de manière interactive et récupérer les lignes de code ; 
+- Les cours de Julien Barnier et Joseph Larmarange ; 
+- le livre [Data Visualization](https://socviz.co/) de Kieran Healy ;
+- les cours de [Boris Mericskay](https://hackmd.io/4pvVFgQkTrqcGuyF-8zQOA?view).
+
+---
+## Exercice : 
+
+A partir des données de la municipalité de Paris, analysez la relation entre le nombre de tournages de film et le nombre de tournage de séries par arrondissement :  
+- Calculez et interprétez le coefficient de corrélation ; 
+- Proposez une visualisation de cette relation avec le package *ggplot2.*
+- Envoyez votre script NOM_Prénom.R et votre graphique avant dimanche soir, en fichiers séparés. 
+
+
+---
+class: middle, center
+
+# Fin
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false,
+"slideNumberFormat": "%current%/%total%"
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

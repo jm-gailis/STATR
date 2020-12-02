@@ -14,9 +14,9 @@ output:
       highlightLines: true
       countIncrementalSlides: false
 editor_options: 
+  
+  
   chunk_output_type: console
-  
-  
 ---
 class: inverse, center, middle
 # Rappel

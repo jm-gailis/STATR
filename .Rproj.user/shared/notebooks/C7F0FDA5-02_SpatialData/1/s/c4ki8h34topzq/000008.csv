@@ -1,5 +1,0 @@
-"0","murders <- read.csv(""c://Users/JulienM/Dropbox/ENS/Cours/FormationR/statsmappingwithR/statsmappingwithR/01_Introduction/data/murders.csv"", stringsAsFactors = F)
-"
-"2","impossible d'ouvrir le fichier 'c://Users/JulienM/Dropbox/ENS/Cours/FormationR/statsmappingwithR/statsmappingwithR/01_Introduction/data/murders.csv' : No such file or directory"
-"2","Error in file(file, ""rt"") : impossible d'ouvrir la connexion
-"

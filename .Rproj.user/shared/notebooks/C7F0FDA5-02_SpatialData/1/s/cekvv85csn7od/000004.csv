@@ -1,3 +1,0 @@
-"0","murders$Population_th <- murders$population/100000"
-"0","murders$Ratio <- murders$total/murders$Population_th"
-"0",""
