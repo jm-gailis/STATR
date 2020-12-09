@@ -18,6 +18,8 @@ Ce cours est créé par Julien Migozzi, AGPR à l'Ecole Normale Supérieure, pou
 
 * Séance 5 : [slides](https://jmigozzi.github.io/statsmappingwithR/05_MapClassification/05_MapClassification.html#1)
 
+* Séance 6 : [slides](https://jmigozzi.github.io/statsmappingwithR/06_Bivariate_Quanti/06_Bivariate_Quanti.html#1)
+
 ## Remerciements
 
 Certains des matériaux de ce cours ont été adaptés ou inspirés de plusieurs sources, et notamment : 
