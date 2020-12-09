@@ -1,0 +1,921 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>La régression linéaire</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="J. Migozzi" />
+    <meta name="date" content="2020-07-12" />
+    <link rel="stylesheet" href="example.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# La régression linéaire
+## Analyse bivariée <br> Statistique et cartographie avec R
+### J. Migozzi
+### Ecole Normale Supérieure
+### 07/12/2020
+
+---
+
+class: inverse, center, middle
+
+# Retours
+
+
+
+
+
+
+
+---
+### Vérifier ses données
+
+- On vérifie la qualité de ses données, qui sont *toujours* remplies d'erreurs. 
+  - combien d'arrondissements ? 
+
+
+- On ne calcule pas un coefficient de corrélation sur deux tableaux différents
+  - à moins d'être sur qu'ils sont dans le même ordre...
+
+---
+### Vérifier ses données
+
+
+```r
+movies_arrdt &lt;- movies_paris %&gt;% 
+  st_set_geometry(NULL) %&gt;%
+  group_by(ardt_lieu) %&gt;% 
+  summarise(Total = n())
+
+table(movies_arrdt$ardt_lieu)
+```
+
+```
+## 
+## 75001 75002 75003 75004 75005 75006 75007 75008 75009 75010 75011 75012 75013 
+##     1     1     1     1     1     1     1     1     1     1     1     1     1 
+## 75014 75015 75016 75017 75018 75019 75020 75116 93200 93500 94320 
+##     1     1     1     1     1     1     1     1     1     1     1
+```
+
+---
+### Recoder et nettoyer ses données
+
+
+```r
+movies_arrdt &lt;- movies_paris %&gt;% 
+  st_set_geometry(NULL) %&gt;%
+  mutate(Type = ifelse(type_tourna == "Long métrage", "Film", 
+                       "Série")) %&gt;%
+  mutate(ardt_lieu = ifelse(ardt_lieu == "75116", "75016", 
+                              ardt_lieu)) %&gt;%
+  mutate(ardt_lieu = as.numeric(ardt_lieu)) %&gt;%
+  filter(ardt_lieu &lt; 80000) %&gt;%
+  group_by(ardt_lieu, Type) %&gt;% 
+  summarise(Total = n())
+
+table(movies_arrdt$ardt_lieu)
+```
+
+```
+## 
+## 75001 75002 75003 75004 75005 75006 75007 75008 75009 75010 75011 75012 75013 
+##     2     2     2     2     2     2     2     2     2     2     2     2     2 
+## 75014 75015 75016 75017 75018 75019 75020 
+##     2     2     2     2     2     2     2
+```
+
+---
+### Préparer ses données
+
+
+```r
+movies_arrdt &lt;- movies_paris %&gt;% 
+  st_set_geometry(NULL) %&gt;%
+  mutate(Type = ifelse(type_tourna == "Long métrage", "Film", "Série")) %&gt;%
+  mutate(ardt_lieu = ifelse(ardt_lieu == "75116", "75016", ardt_lieu)) %&gt;%
+  mutate(ardt_lieu = as.numeric(ardt_lieu)) %&gt;%
+  filter(ardt_lieu &lt; 80000) %&gt;%
+  filter(Type == "Film") %&gt;%
+  group_by(ardt_lieu) %&gt;% 
+  summarise(Film = n())
+
+serie_arrdt &lt;- movies_paris %&gt;% 
+  st_set_geometry(NULL) %&gt;%
+  mutate(Type = ifelse(type_tourna == "Long métrage", "Film", "Série")) %&gt;%
+  mutate(ardt_lieu = ifelse(ardt_lieu == "75116", "75016", ardt_lieu)) %&gt;%
+  mutate(ardt_lieu = as.numeric(ardt_lieu)) %&gt;%
+  filter(ardt_lieu &lt; 80000) %&gt;%
+  filter(Type == "Série") %&gt;%
+  group_by(ardt_lieu) %&gt;% 
+  summarise(Série = n())
+
+ardt &lt;- merge(movies_arrdt, serie_arrdt, by = "ardt_lieu" )
+```
+
+---
+### Visualiser ses données
+
+.left-code[
+
+```r
+library(ggrepel)
+
+ggplot(ardt, aes(Film, Série, label = ardt_lieu)) +
+  geom_point(size = 4) +
+  geom_label_repel() +
+  theme_bw() 
+```
+]
+
+.right-plot[
+![](07_Regression_files/figure-html/plot-labelS1-out-1.png)&lt;!-- --&gt;
+]
+
+
+---
+### Visualiser ses données : une droite ? 
+
+.left-code[
+
+```r
+library(ggrepel)
+
+ggplot(ardt, aes(Film, Série, label = ardt_lieu)) +
+  geom_point(size = 4) +
+  geom_label_repel() +
+  geom_smooth(method = "lm", se = F) +
+  theme_bw() 
+```
+]
+
+.right-plot[
+![](07_Regression_files/figure-html/plot-labelS2-out-1.png)&lt;!-- --&gt;
+]
+
+
+---
+class: inverse, center, middle
+
+# La régression linéaire
+
+### Le couteau suisse de la modélisation
+
+---
+### Une méthode statistique
+
+- Déterminer une droite pour un jeu de données : on parle d'ajuster une droite (*fiting*) à un nuage de points. 
+
+- Modéliser la relation entre *X* et *Y* en traçant une droite. 
+
+- Cette ligne droite se nomme la **droite de régression**.
+
+--
+
+&lt;br&gt;
+
+- La Méthode des Moindres Carrés (MCO) fait partie des techniques de régression les plus connues (*Ordinary Least Squares* en anglais - OLS).
+
+- Il s’agit : 
+  1. de calculer la droite des moindres carrés ordinaires, qui minimise le carré des résidus. On obtient donc une équation qui modélise la relation entre X et Y.
+  2. d'évaluer la qualité de ce modèle, en mesurant son pouvoir explicatif. 
+  3. de cartographier les écarts à ce modèle (les résidus).
+
+---
+### Tracer un nuage de points
+
+
+.left-code[
+
+```r
+# Scatter plot
+
+ggplot(idf_sf, aes(PCAD07, RFUCQ207)) +
+  geom_point(size = 4,
+             alpha = 0.5) + 
+  theme_bw(base_size = 24) +
+  labs(x = "% de cadres en 2007", y = "Revenu médian en 2007")
+
+# Corrélation
+cor(idf_sf$PCAD07, idf_sf$RFUCQ207)
+```
+]
+
+.right-plot[
+![](07_Regression_files/figure-html/plot-label1-out-1.png)&lt;!-- --&gt;
+
+```
+## [1] 0.8784743
+```
+]
+
+---
+### Visualiser chaque distribution
+
+
+.left-code[
+
+```r
+library(ggExtra)
+
+# Scatter plot
+p &lt;- ggplot(idf_sf, aes(PCAD07, RFUCQ207)) +
+  geom_point(size = 4,
+             alpha = 0.5) + 
+  theme_bw(base_size = 24) +
+  labs(x = "% de cadres en 2007", y = "Revenu médian en 2007")
+
+# Marginal boxplot
+ggMarginal(p, type = "boxplot", size = 10)
+```
+]
+
+.right-plot[
+![](07_Regression_files/figure-html/plot-label2-out-1.png)&lt;!-- --&gt;
+]
+
+---
+### Tracer une droite
+
+
+.left-code[
+
+```r
+ggplot(idf_sf, aes(PCAD07, RFUCQ207)) +
+  geom_point(size = 4,
+             alpha = 0.5) + 
+  theme_bw(base_size = 24) +
+  labs(x = "% de cadres en 2007", y = "Revenu médian en 2007") +
+  geom_smooth(method = "lm")
+```
+]
+
+.right-plot[
+![](07_Regression_files/figure-html/plot-label3-out-1.png)&lt;!-- --&gt;
+]
+
+---
+### Equation de la droite de régression
+
+.center[Formule pour une ligne droite]
+
+$$ \small Y_i = a + bx $$
+- X est la variable explicative
+- Y est la variable dépendante
+- a et b sont des coefficients :  
+  - a est l'intersection, soit la valeur de X quand Y = O ; 
+  - b est la pente
+
+---
+### Equation de la droite de régression
+
+
+.center[Formule pour un modèle de régression linéaire]
+
+$$ \small \hat{Y_i}= \beta_0 + \beta_1 X_i + \epsilon_i $$
+- Xi est la valeur de la variable explicative.
+- `\(\hat{Y_i}\)` est la valeur estimée de la variable à expliquer.
+- `\(\beta_0\)` est l'intersection (*intercept*)
+- `\(\beta_1\)` est la pente, ou le coefficient de régression 
+- `\(\epsilon_i\)` est l'erreur aléatoire : le *résidu*.
+
+
+--
+
+&lt;br&gt;
+.center[.content-box-red[Un modèle ?]]
+
+&lt;br&gt;
+
+.center[.content-box-blue[*Data* = *Fit* (ce qui est capturé par le modèle) + *Residual* (ce qui ne l’est pas)]]
+
+---
+### Méthode des moindres carrés
+
+.pull-left[
+- Objectif : obtenir les plus petits résidus possibles. 
+
+- Méthode : tracer une droite qui *minimise le carré des résidus*. 
+
+- Minimiser les écarts entre la droite (les valeurs prédites par l'équation) et les points (les données empiriques).
+
+- résidu = la différence entre la donnée observée et la donnée prédite par le modèle, soit `\(\small \epsilon_i = y_i - ax_i - b\)`
+]
+
+.pull-right[
+&lt;img src="07_Regression_files/figure-html/unnamed-chunk-4-1.png" width="100%" style="display: block; margin: auto;" /&gt;
+]
+
+---
+### Application sur R
+
+- Utilisation de la fonction *lm()*, pour *linear models*.
+
+&lt;br&gt;&lt;br&gt;
+
+.center[lm(Y ~ X, data = df = tableau)]
+
+&lt;br&gt;&lt;br&gt;
+
+.center[lm(Y ~ X, data = data.frame *ou* objetsf)]
+
+&lt;br&gt;&lt;br&gt;
+.center[lm(RFUCQ207 ~ PCAD07, data = idf_sf)]
+
+---
+### Application sur R
+
+
+
+```r
+lm(RFUCQ207 ~ PCAD07, data = idf_sf)
+```
+
+```
+## 
+## Call:
+## lm(formula = RFUCQ207 ~ PCAD07, data = idf_sf)
+## 
+## Coefficients:
+## (Intercept)       PCAD07  
+##       10476          432
+```
+
+
+- La valeur de l'intercept, ou `\(\beta_0\)`, est 10476.
+- La valeur de la pente, ou `\(\beta_1\)`, est 432.
+- On obtient la formule suivante :
+
+
+`$$\tiny \operatorname{RFUCQ207} =  \beta_0 + \beta_{1}(\operatorname{PCAD07}) + \epsilon$$`
+Soit : 
+
+`$$\tiny \operatorname{RFUCQ207} = 10476 + 432(\operatorname{PCAD07}) + \epsilon$$`
+
+
+
+
+
+
+---
+### Visualiser le modèle 
+
+.left-code[
+
+```r
+# Valeur estimée
+idf_sf &lt;- idf_sf %&gt;% 
+  mutate(RevenusPredict = 10476+432*PCAD07)
+
+ #Modèle
+ggplot(idf_sf, aes(x = PCAD07, 
+                   y = RevenusPredict)) +
+  #valeurs prédites
+geom_point(fill = "black", 
+           size = 4, shape = 21) + 
+  # écarts
+  geom_segment(aes(xend = PCAD07, 
+                   yend = RFUCQ207), 
+             alpha = .5) + 
+  
+  # Données empiriques
+geom_point(data = idf_sf, aes(PCAD07,RFUCQ207, 
+                              fill = Residuals), 
+           size = 5, 
+           shape = 21) + 
+  # droite de régression
+geom_smooth(data = idf_sf, 
+            aes(PCAD07,RFUCQ207),
+            method = "lm", 
+            se = F,
+            col = "red") + 
+  #couleurs pour résidus
+scale_fill_gradient2(low = "blue", 
+                     mid = "white", 
+                     high = "red") + 
+  
+  #habillage
+theme_bw(base_size = 24) +
+guides(fill = FALSE)  +
+labs(x = "% de cadres en 2007",
+     y = "Revenu médian en 2007") 
+```
+]
+
+.right-plot[
+![](07_Regression_files/figure-html/plot-label4-out-1.png)&lt;!-- --&gt;
+]
+
+---
+### Interprétation
+
+`$$\tiny \operatorname{RFUCQ207} = 10476 + 432(\operatorname{PCAD07}) + \epsilon$$`
+
+
+- Quand X augmente d'une unité, Y augmente de `\(\beta_{1}\)` unité, au dessus de la valeur constante `\(\beta{0}\)`.
+
+- Quand le pourcentage de cadre augmente de 1% (X), le revenu médian augmente de 432 unités (Y), au dessus de la valeur 10476.
+
+- Quel serait le revenu estimé pour un taux de 40% et 41 % ?
+
+--
+
+
+```r
+a &lt;- predict(model, data.frame(PCAD07 = c(40, 41)))
+a
+```
+
+```
+##        1        2 
+## 27755.84 28187.84
+```
+
+```r
+a[2] - a[1]
+```
+
+```
+##        2 
+## 432.0036
+```
+
+
+---
+class: middle, inverse, center
+
+# Estimer un modèle
+
+### Coefficient et résidus
+
+---
+### Quantifier l'ajustement d'un modèle 
+
+- Le rapport entre variance de la variable estimée et variance de la variable observée permet de quantifier le pouvoir explicatif du modèle.
+
+- Ce rapport est noté `\(R^2\)` : c'est le coefficient de détermination. Il est égal au carré du coefficient de corrélation (cf *pearson*).
+
+- Il peut être interprété comme une pourcentage de la variance expliquée : “*le modèle explique 65% de la variation de la variable étudiée*”.
+
+---
+### Calculer un R2 
+
+
+$$ \tiny R^2 = \frac{VAR(y_e)}{VAR(y)} = 1 - \frac{VAR(\epsilon)}{VAR(y)} $$
+
+
+```r
+# Somme des résidus au carré
+sum_res &lt;- sum(idf_sf$Residuals^2)
+# Moyenne de Y
+mean_y &lt;- mean(idf_sf$RFUCQ207)
+# Ecart à la moyenne au carré
+ecart &lt;- (idf_sf$RFUCQ207 - mean_y)^2
+# R2 = somme des résidus / somme des écarts
+1 - sum_res / sum(ecart)
+```
+
+```
+## [1] 0.7717171
+```
+
+.center[Le pourcentage de cadres explique 77% de la variance du revenu médian.]
+
+---
+### Application sur R 
+
+
+```r
+model &lt;- lm(RFUCQ207 ~ PCAD07, data = idf_sf)
+
+summary(model)
+```
+
+```
+## 
+## Call:
+## lm(formula = RFUCQ207 ~ PCAD07, data = idf_sf)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -8397.8 -2290.2  -208.7  2045.2 10847.1 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept) 10475.70     585.16   17.90   &lt;2e-16 ***
+## PCAD07        432.00      19.79   21.83   &lt;2e-16 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 3355 on 141 degrees of freedom
+## Multiple R-squared:  0.7717,	Adjusted R-squared:  0.7701 
+## F-statistic: 476.7 on 1 and 141 DF,  p-value: &lt; 2.2e-16
+```
+
+
+---
+### Vérifier le modèle
+
+- Le modèle de régression linéaire simple repose sur plusieurs hypothèses. 
+
+- Normalité : les résidus doivent avoir une distrubution normale normalement répartis, donc avoir une distribution normale. Il faut donc regarder s'il n'y a rien d'anormal dans les résidus.
+
+- Valeurs aberrantes : le modèle est trop influencé par le poids d'individus
+
+--
+
+- Le diagnostic d'un modèle passe par la visualisation :
+  - *QQ-Plot* : les résidus selon leur quantiles théoriques d'après le modèle de régression. 
+  - *Scatter plot* : relation entre valeurs ajustées et les résidus eux-mêmes. 
+
+--
+  
+- La distribution des résidus doit être normale (répartition uniforme des points) : 
+  - le long de la droite pour le *QQ-Plot* ;
+  - de manière uniforme pour le *scatter plot*
+  
+
+  
+---
+### Diagnostic des résidus
+
+
+```r
+par(mfrow= c(2, 2))
+plot(model)
+```
+
+&lt;img src="07_Regression_files/figure-html/unnamed-chunk-10-1.png" width="55%" style="display: block; margin: auto;" /&gt;
+
+--
+
+.center[Distribution anormale : le modèle de régression linéaire n'est pas approprié.]
+
+
+---
+### Repérer les *outliers*
+
+- Repérer les valeurs aberrantes : une observation "anormale" d'après ce que le modèle prédit. 
+
+&lt;img src="07_Regression_files/figure-html/unnamed-chunk-11-1.png" width="55%" style="display: block; margin: auto;" /&gt;
+
+--
+
+.center[Une valeur aberrante = individu intéressant, à examiner de plus près.]
+
+---
+### Repérer les outliers
+
+Les valeurs aberrante influencent fortement le tracé de la droite, et donc les résultats du modèle. 
+
+
+
+&lt;img src="07_Regression_files/img/Outliers.PNG" width="75%" style="display: block; margin: auto;" /&gt;
+.center[.tiny[ Source : [Introduction to Modern Statistics](https://openintro-ims.netlify.app/intro-linear-models.html#resids)]]
+
+
+
+&lt;!-- D : There is a primary cloud and then a small secondary cloud of four outliers. The secondary cloud appears to be influencing the line somewhat strongly, making the least square line fit poorly almost everywhere. There might be an interesting explanation for the dual clouds, which is something that could be investigated. --&gt;
+
+&lt;!-- E: There is no obvious trend in the main cloud of points and the outlier on the right appears to largely control the slope of the least squares line. --&gt;
+
+&lt;!-- F: There is one outlier far from the cloud. However, it falls quite close to the least squares line and does not appear to be very influential. --&gt;
+
+---
+### Exercice
+
+- La figure ci-dessous propose les *scatterplots* de 3 jeux de données : 
+  - la 1ere ligne montre la relation entre X et Y, avec une droite de régression. ; 
+  - la 2e  montre les graphiques des résidus associés ; 
+
+- Question 1 : Quelles tendances identifiez-vous à partir la distribution des résidus ? 
+- Question 2 : Pour quel jeu de données le modèle de régression linéaire MCO vous semble-t-il pertinent ? 
+
+&lt;img src="07_Regression_files/img/Residuals.PNG" width="50%" style="display: block; margin: auto;" /&gt;
+.center[.tiny[ Source : [Introduction to Modern Statistics](https://openintro-ims.netlify.app/intro-linear-models.html#resids)]]
+
+---
+### Solutions
+
+- Data 1 : pas de tendance anormale dans la distribution des résidus. Répartition égale et *randoù* autour de la ligne en pointillés qui représente 0.
+
+&lt;br&gt;
+- Data 2 : on observe une nette tendance dans les résidus : une courbe, déjà visible dans le nuage de points, devient flagrante dans le graphique des résidus. Un modèle de régression linéaire MCO n'est pas adaptée ici. 
+
+&lt;br&gt;
+
+- Data 3 : Une relation linéaire et positive est discernable, mais elle est très faible. Pas d'anormalité dans les résidus. On peut raisonnablement tenter d'ajuster un modèle linéaire de type OLS.
+
+
+
+---
+class: middle, inverse, center
+
+# La régression linéaire 
+
+### Application géographique
+
+---
+### Une méthode commune appliquée à des données spatiales
+
+
+- Mise en valeur des composantes spatiales de la relation entre deux variables ; 
+
+  - cartographier les *écarts* au modèle (les *résidus*, soit les unités spatiales qui sont moins bien expliquées ou prédites par le modèle).
+  
+  &lt;br&gt;
+  
+.center[.content-box-blue[Cartographier un modèle statistique]]
+   &lt;br&gt;
+
+--
+
+  - en identifiant des effets d'*autocorrelation spatiale* pour proposer une analyse quantifiée de la structure spatiale d'un phénomène et démontrer des effets de voisinage.
+  
+   &lt;br&gt; 
+.center[.content-box-blue[Statistique spatiale : prendre en compte la distance dans le modèle]]
+  &lt;br&gt;
+
+
+
+---
+### Cartographier les résultats d'un modèle linéaire 
+
+
+&lt;img src="07_Regression_files/figure-html/unnamed-chunk-14-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+### Interpréter les résidus
+
+
+Les  résidus  correspondent  alors  à  l’écart  qui  peut  exister  entre  ce  modèle  et  la relation  réelle.  
+
+- Deux informations : 
+  - la valeur (proche ou éloignée de 0 ); 
+  - le signe (positif ou négatif). 
+
+
+- Deux types de résidus : 
+  - résidus positifs : valeur sous-estimée par le modèle
+  - résidus négatifs : valeur sur-estimée par le modèle.
+
+---
+### Cartographier les résidus 
+
+- Les résidus constituent donc une nouvelle variable quantitative que l’on peut discrétiser pour cartographier.
+
+- Une carte des résidus mets donc évidence des phénomènes de différenciation spatiale.
+
+- la valeur 0 qui correspond au modèle doit être mise en avant :
+  - si le nombre de classes est pair, le 0 apparaît comme une limite de classe ;
+  - si le nombre est impair (préférable) le 0 est inclus dans une *classe centrale* qui correspond aux individus proche ou égal au modèle
+
+- Par convention, on choisit 2 palettes de couleur : l’une pour les résidus négatifs et l’autre pour les positifs. On en fait ensuite varier la teinte : plus la teinte de la couleur sera foncée, plus la valeur des résidus sera forte.
+
+
+---
+### Rappel sur la distribution normale
+
+
+&lt;img src="07_Regression_files/img/Normal.png" width="70%" style="display: block; margin: auto;" /&gt;
+.center[.tiny[Source : [Wikipedia](https://fr.wikipedia.org/wiki/R%C3%A8gle_68-95-99,7#/media/Fichier:Empirical_rule_histogram.svg)]]
+
+
+---
+### Visualiser les résidus
+
+
+
+```r
+idf_sf$Residuals &lt;- model$residuals
+hist(idf_sf$Residuals)
+```
+
+&lt;img src="07_Regression_files/figure-html/unnamed-chunk-16-1.png" style="display: block; margin: auto;" /&gt;
+
+
+---
+### Application 
+
+.left-code[
+
+```r
+#Normaliser résidus
+idf_sf$Residuals &lt;- as.vector(scale(model$residuals))
+
+# CLassification
+
+vec_breaks &lt;- c(min(idf_sf$Residuals), 
+                -2, 
+                -1, 1, 
+                2, 
+                max(idf_sf$Residuals))
+
+# objet sf pour département
+dpt &lt;- idf_sf %&gt;%  
+  group_by(CODE_DEPT) %&gt;% 
+  summarize(geometry = st_union(geometry))
+
+#Carto
+
+choroLayer(idf_sf, 
+          var = "Residuals", 
+          legend.title.txt = "Résidus",
+          breaks = vec_breaks,
+          legend.values.cex = 1.5,
+          legend.values.rnd = 1,
+          col = carto.pal(pal1 = "blue.pal", n1 =2, 
+                          pal2 = "orange.pal", n2 = 3),
+          legend.pos = "topleft")
+
+plot(st_geometry(dpt), add = T, col = NA, lwd = 2)
+
+layoutLayer("Cadres et revenu médian en Ile de France", 
+author = "Auteur : J. Migozzi, 2020", 
+sources ="Les écarts résultent d'une régression linéaire nentre le taux de cadres et le revenu médian en 2007.\nR2 : 0,77.\nSource des données = INSEE")
+```
+
+]
+
+.right-plot[
+![](07_Regression_files/figure-html/plot-label5-out-1.png)&lt;!-- --&gt;
+]
+
+---
+### Application avec tmap
+
+.left-code[
+
+```r
+tm_shape(idf_sf) +
+  tm_polygons("Residuals", 
+              style = "fixed",
+              title = "Résidus",
+              breaks = vec_breaks,
+              legend.hist = TRUE,
+              palette = "RdBu") +
+  tm_legend(outside = TRUE, hist.width = 2) 
+```
+
+]
+
+.right-plot[
+![](07_Regression_files/figure-html/plot-label6-out-1.png)&lt;!-- --&gt;
+]
+
+---
+### Exercice
+
+1. Réaliser un modèle linéaire pour prédire le nombre de tournage de séries par rapport au nombre de films. 
+
+2. En examinant les résidus et les éventuels outliers, évaluer la qualité et la pertinence de ce modèle linéaire. Vous écrirez votre commentaire au sein du script.
+
+3. Par une carte choroplèthe, proposer une cartographie du modèle. 
+
+4. Envoyez votre script "NOM_Prénom.R" et votre carte sur Slack. 
+
+---
+class: middle, center
+
+# .center[Fin]
+
+---
+### Ressources : 
+
+- [Baron et Zanin, 2005, "Un tableau de données, pour quoi faire ?", Feuille de géographie n° 56](https://feuilles-de-geographie.parisnanterre.fr/wp-content/uploads/2016/06/2005_56.pdf)
+
+- [Çetinkaya-Rundel &amp; Hardin, 2020, *Introduction to Modern Statistics*](https://openintro-ims.netlify.app/)
+
+
+&lt;!-- Pour  traiter  la  question  sur  les  résidus,  un  rappel  de  leur  signification  est  sans  doute nécessaire.  En  préambule  on  insistera  sur  le  fait  que  la  détermination  d’une  équation  de régression n’est pas une fin en soi et que seule l’interprétation géographique est intéressante. --&gt;
+
+&lt;!-- Les résidus sont le résultat d’une analyse bi-variée entre une variable X et une variable Y. Oncherche à expliquer les variations de Y en fonction de celles de X au moyen d’une équation.  --&gt;
+&lt;!-- Attention on rappelle et on insiste sur le fait que la mise en évidence des dépendances entreles variations de X et celles de Y ne signifie pas qu’il y a causalité.  --&gt;
+
+&lt;!-- Lorsque le coefficient decorrélation entre deux variables est significatif, on est en droit d’essayer de trouver l’équationde la droite de régression linéaire, considérée comme le modèle de la relation, si cette relationétait  totale.   --&gt;
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false,
+"slideNumberFormat": "%current%/%total%"
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
