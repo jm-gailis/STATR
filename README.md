@@ -20,6 +20,8 @@ Ce cours est créé par Julien Migozzi, AGPR à l'Ecole Normale Supérieure, pou
 
 * Séance 6 : [slides](https://jmigozzi.github.io/statsmappingwithR/06_Bivariate_Quanti/06_Bivariate_Quanti.html#1)
 
+* Séance 7 : [slides](https://jmigozzi.github.io/statsmappingwithR/07_Regression/07_Regression.html#1)
+
 ## Remerciements
 
 Certains des matériaux de ce cours ont été adaptés ou inspirés de plusieurs sources, et notamment : 
@@ -28,6 +30,7 @@ Certains des matériaux de ce cours ont été adaptés ou inspirés de plusieurs
 * [Introduction à R et au tidyverse](https://juba.github.io/tidyverse/) de Julien Barnier.
 * [Cartographie avec R](https://rcarto.github.io/carto_avec_r/) de Timothée Giraud et Hugues Pecout.
 * [R et espace](https://framabook.org/r-et-espace/), du collectif "Groupe ElementR".
-
+* [Introduction to Modern Statistics](https://openintro-ims.netlify.app) de Mine Çetinkaya-Rundel et Johanna Hardin.
+* [Apprentissage des statistiques avec Jamovi](https://jmeunierp8.github.io/ManuelJamovi/) de Danielle Navarro, David Foxcroft et Jean-Marc Meunier (Traduction).
 
 
