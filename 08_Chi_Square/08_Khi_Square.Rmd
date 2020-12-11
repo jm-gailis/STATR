@@ -1,0 +1,85 @@
+---
+title: "Le test du Khi-deux"
+subtitle: "Analyse bivariée <br> Statistique et cartographie avec R"
+author: "J. Migozzi"
+institute: "Ecole Normale Supérieure"
+date: "14/12/2020"
+output:
+  xaringan::moon_reader:
+    #yolo: true
+    # css: [default, metropolis, metropolis-fonts]
+    # css: ["default", "default-fonts", "hygge"]
+    css: example.css
+    lib_dir: libs
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+      slideNumberFormat: "%current%/%total%"           # 12/42
+editor_options: 
+  chunk_output_type: console
+
+---
+class: inverse, center, middle
+
+# Retours
+
+
+
+
+
+```{r setup, include=FALSE}
+
+setwd("C:/Users/jmigozzi/Dropbox/ENS/Cours/FormationR/statsmappingwithR/statsmappingwithR")
+# options(htmltools.dir.version = FALSE)
+# knitr::opts_chunk$set(fig.retina=2)
+#knitr::opts_chunk$set(cache = F)
+# 
+
+# library(Cairo)
+# library(cairoDevice)
+# load("my_work_space.RData")
+library(tidyverse)
+library(knitr)
+library(kableExtra)
+library(sf)
+library(spData)
+library(mapview)
+library(tmap)
+library(cartography)
+library(viridis)
+library(ggthemes)
+library(hrbrthemes)
+library(tmap)
+
+
+idf_sf <- st_read(dsn = "02_SpatialData/data/parispc_com.shp", 
+                  crs = 2154, 
+                  stringsAsFactors = F)
+soc_eco <- read.csv("02_SpatialData/data/paris_soc_eco.csv")
+
+
+soc_eco$INSEE_COM <- as.character(soc_eco$CODGEO)
+
+idf_sf <- left_join(idf_sf, #objet 1 : l'objet sf
+                    soc_eco, #objet 2 : le data.frame
+                    by = "INSEE_COM") # l'identifiant commun
+
+movies_paris <- st_read(dsn = "03_DataWrangling/data/lieux-de-tournage-a-paris/lieux-de-tournage-a-paris.shp", 
+                        crs = 4326, 
+                        stringsAsFactors = F)
+
+
+
+options(tidyverse.quiet = TRUE)
+```
+
+
+---
+### Ressources : 
+
+- [Baron et Zanin, 2005, "Un tableau de données, pour quoi faire ?", Feuille de géographie n° 56](https://feuilles-de-geographie.parisnanterre.fr/wp-content/uploads/2016/06/2005_56.pdf)
+
+- [Çetinkaya-Rundel & Hardin, 2020, *Introduction to Modern Statistics*](https://openintro-ims.netlify.app/)
+
+

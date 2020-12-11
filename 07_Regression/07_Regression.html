@@ -26,9 +26,6 @@ class: inverse, center, middle
 
 
 
-
-
-
 ---
 ### Vérifier ses données
 
@@ -599,7 +596,7 @@ Les valeurs aberrante influencent fortement le tracé de la droite, et donc les 
 ---
 ### Solutions
 
-- Data 1 : pas de tendance anormale dans la distribution des résidus. Répartition égale et *randoù* autour de la ligne en pointillés qui représente 0.
+- Data 1 : pas de tendance anormale dans la distribution des résidus. Répartition égale et *random* autour de la ligne en pointillés qui représente 0.
 
 &lt;br&gt;
 - Data 2 : on observe une nette tendance dans les résidus : une courbe, déjà visible dans le nuage de points, devient flagrante dans le graphique des résidus. Un modèle de régression linéaire MCO n'est pas adaptée ici. 
@@ -666,15 +663,15 @@ Les  résidus  correspondent  alors  à  l’écart  qui  peut  exister  entre  
 
 - Les résidus constituent donc une nouvelle variable quantitative que l’on peut discrétiser pour cartographier.
 
-- Une carte des résidus mets donc évidence des phénomènes de différenciation spatiale.
+- Une carte des résidus mets donc évidence des phénomènes de différenciation spatiale : mettre en valeur les résidus positifs ou négatifs. 
 
-- la valeur 0 qui correspond au modèle doit être mise en avant :
+- la valeur 0 qui traduit la conformité au modèle doit donc être mise en avant :
   - si le nombre de classes est pair, le 0 apparaît comme une limite de classe ;
-  - si le nombre est impair (préférable) le 0 est inclus dans une *classe centrale* qui correspond aux individus proche ou égal au modèle
+  - si le nombre est impair (préférable) le 0 est inclus dans une *classe centrale* qui correspond aux individus proches ou égaux au modèle.
 
 - Par convention, on choisit 2 palettes de couleur : l’une pour les résidus négatifs et l’autre pour les positifs. On en fait ensuite varier la teinte : plus la teinte de la couleur sera foncée, plus la valeur des résidus sera forte.
 
-
+.center[C'est l'interprétation géographique de la carte qui est primordiale.]
 ---
 ### Rappel sur la distribution normale
 
@@ -787,14 +784,6 @@ class: middle, center
 - [Baron et Zanin, 2005, "Un tableau de données, pour quoi faire ?", Feuille de géographie n° 56](https://feuilles-de-geographie.parisnanterre.fr/wp-content/uploads/2016/06/2005_56.pdf)
 
 - [Çetinkaya-Rundel &amp; Hardin, 2020, *Introduction to Modern Statistics*](https://openintro-ims.netlify.app/)
-
-
-&lt;!-- Pour  traiter  la  question  sur  les  résidus,  un  rappel  de  leur  signification  est  sans  doute nécessaire.  En  préambule  on  insistera  sur  le  fait  que  la  détermination  d’une  équation  de régression n’est pas une fin en soi et que seule l’interprétation géographique est intéressante. --&gt;
-
-&lt;!-- Les résidus sont le résultat d’une analyse bi-variée entre une variable X et une variable Y. Oncherche à expliquer les variations de Y en fonction de celles de X au moyen d’une équation.  --&gt;
-&lt;!-- Attention on rappelle et on insiste sur le fait que la mise en évidence des dépendances entreles variations de X et celles de Y ne signifie pas qu’il y a causalité.  --&gt;
-
-&lt;!-- Lorsque le coefficient decorrélation entre deux variables est significatif, on est en droit d’essayer de trouver l’équationde la droite de régression linéaire, considérée comme le modèle de la relation, si cette relationétait  totale.   --&gt;
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>

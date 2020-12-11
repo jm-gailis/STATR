@@ -25,9 +25,6 @@ class: inverse, center, middle
 # Retours
 
 
-
-
-
 ```{r setup, include=FALSE}
 
 setwd("C:/Users/jmigozzi/Dropbox/ENS/Cours/FormationR/statsmappingwithR/statsmappingwithR")
