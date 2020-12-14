@@ -22,6 +22,8 @@ Ce cours est créé par Julien Migozzi, AGPR à l'Ecole Normale Supérieure, pou
 
 * Séance 7 : [slides](https://jmigozzi.github.io/statsmappingwithR/07_Regression/07_Regression.html#1)
 
+* Séance 8 : [slides](https://jmigozzi.github.io/statsmappingwithR/08_Chi_Square/08_Chi_Square.html#1
+
 ## Remerciements
 
 Certains des matériaux de ce cours ont été adaptés ou inspirés de plusieurs sources, et notamment : 
