@@ -61,7 +61,7 @@ Vous avez également une carte et un schéma à disposition sur Slack et sur le 
 ## Exercice 1 (*5 points*)
 
 
-1. Ouvrez le jeu de données *us_elections.gkpg* en utilisant le package 'sf'. Combien de variables et d'unités spatiales composent ce jeu de données ? Quelle fonction pouvez vous utiliser pour répondre à cette question ? Quel est le système de projection utilisée ? 
+1. Ouvrez le jeu de données *us_elections.gpkg* en utilisant le package 'sf'. Combien de variables et d'unités spatiales composent ce jeu de données ? Quelle fonction pouvez vous utiliser pour répondre à cette question ? Quel est le système de projection utilisée ? 
 
 2. Proposez une ligne de code qui recensent le nombre de comtés pour chaque Etat fédéré. Combien l'Etat de Caroline du Nord comporte-t-il de *counties* ?  
 
