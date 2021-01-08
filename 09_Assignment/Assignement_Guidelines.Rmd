@@ -36,7 +36,7 @@ Vous disposez d'un jeu de données sur les élections présidentielles aux Etats
 \item fips5 : identifiant du comté
 \item state\_abbv : Abréviation de l'Etat fédéré d'appartenance. 
 \item county\_name : Nom du comté
-\item state\_name : Nom de lc'Etat fédéré
+\item state\_name : Nom de l'Etat fédéré
 \item votes\_dem\_2016 : nombre de votes pour le parti démocrate en 2016
 \item votes\_gop\_2016 : nombre de votes pour le parti républicain en 2016
 \item votes\_dem\_2020 : nombre de votes pour le parti démocrate en 2020
@@ -101,39 +101,55 @@ On peut donc créer très facilement, avec la fonction *mutate*, une 4e colonne,
 La 3e étape du code permet de visualiser le nouveau tableau créé, par un diagramme en bâtons, avec le package ggplot2.
 
 ```{r, eval = F}
-#####################################################################################
-
-library(tidyverse) #si ce n'est pas déjà fait
+library(tidyverse) 
 
 ## Etape 1 : calcul des effectifs agrégés
-
-nouvelObjet <- us_elections %>% # le jeu de données original
-    st_set_geometry(NULL) %>% #j'enlève les données géométriques
-    group_by(state_name) %>% #je regroupe éventuellement les entités selon un identifiant commun
+nouvelObjet <- us_elections %>% # Le jeu de données original
+    st_set_geometry(NULL) %>% # Optionnel : ici, l'enlève les formes géométriques
+                              # du tableau pour simplifier le calcul
+                              # L'objet SF devient donc un simple data.frame
+                              # Mais je les garder si je souhaite cartographier
+    group_by(state_name) %>% # OPTIONNEL = je regroupe éventuellement 
+                             # les indidividus selon un identifiant commun, 
+                             # ici le nom de l'état fédéré
     summarise(White = sum(... ), # Je calcule les totaux pour chaque groupe
-              Black = sum(...), # à vous de remplacer les points de suspension !
+              Black = sum(...),  # A vous de compléter
               Hispanic = sum(...),
-              Asian = sum(...))
+              Asian = sum(...) 
+              ) #penser à refermer la parenthèse !
 
-nouvelObjet #regardez l'objet
+glimpse(nouvelObjet) #regardez l'objet
+plot(st_geometry(nouvelObjet)) # Si j'ai conservé les géométries, carto rapide
 
 # Etape 2 : Réagencement du tableau
 nouvelObjet2 <- nouvelObjet %>%
-  select(state_name, White, Black, Asian, Hispanic) %>% # sélection des variables à réagencer
-  pivot_longer(-state_name, # identifiant que je souhaite conserver
-               names_to = "Race", #le nom de la variable qualitative
-               values_to = "Population") %>% #le nom de la variable quanti
-  group_by(state_name) %>% # pour regrouper les individus selon leur état
-  mutate(PCT = Population/sum(Population)*100) #je crée une colonne de pourcentage
+  select(state_name, White, Black, Asian, Hispanic) %>% # Sélection des variables                                                         # à réagencer
+  pivot_longer(-state_name, # Identifiant que je souhaite conserver
+               names_to = "Race", # Le nom de la variable qualitative
+               values_to = "Population") %>% # Le nom de la variable quanti
+  group_by(state_name) %>% # OPTIONNEL pour regrouper 
+                          # les individus selon leur état, afin de calculer
+                          # le pourcentage par état
+  mutate(PCT = Population/sum(Population)*100) # Je crée une colonne de                                                         # pourcentage
 
-nouvelObjet2 #regardez l'objet
+glimpse(nouvelObjet2) # Regardez l'objet
 
 # Etape 3 : Visualisation
-ggplot(nouvelObjet2, aes(Race, Population, 
-                         fill =  Race)) +  #remplissage selon les modalités de la variable Race
-  geom_col() #diagramme en bâton
 
-####################################################################################
+# Les effectifs
+ggplot(nouvelObjet2, aes(Race, Population, 
+                         fill =  Race)) +  # Remplissage du geom selon les                                                    # modalités de la variable Race
+geom_col() + # geom = un diagramme en bâton
+facet_wrap(~ state_name) # OPTIONNEL = à rajouter si j'ai utilisé un group_by()
+                          # sur une variable catégorielle
+                          # un diagramme par Etat
+# Les Pourcentages
+ggplot(nouvelObjet2, aes(Race, PCT, 
+                         fill =  Race)) +  # Remplissage du geom selon les                                                    # modalités de la variable Race
+geom_col() + # geom = un diagramme en bâton
+facet_wrap(~ state_name) # OPTIONNEL = à rajouter si j'ai utilisé un group_by()
+                          # sur une variable catégorielle
+                          # un diagramme par Etat
 ```
 
 
