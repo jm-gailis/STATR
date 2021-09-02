@@ -4,7 +4,7 @@
 
 Ce répertoire héberge les présentations et les jeux de données du cours "Introduction aux méthodes quantitatives : statistique et cartographie avec R". 
 
-Ce cours a été créé et archivé en ligne par Julien Migozzi, AGPR au département Géographie et Territoiores de l'Ecole Normale Supérieure en 2020-2021.
+Ce cours a été créé et archivé en ligne par Julien Migozzi, AGPR au département Géographie et Territoires de l'Ecole Normale Supérieure lors de l'année universitaire 2020-2021.
 
 ## Présentations
 
