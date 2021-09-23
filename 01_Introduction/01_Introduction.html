@@ -3,7 +3,8 @@
   <head>
     <title>Introduction aux méthodes quantitatives avec R</title>
     <meta charset="utf-8" />
-    <meta name="author" content="J. Migozzi" />
+    <meta name="author" content="R. Leconte" />
+    <script src="libs/header-attrs/header-attrs.js"></script>
     <link href="libs/remark-css/default.css" rel="stylesheet" />
     <link href="libs/remark-css/default-fonts.css" rel="stylesheet" />
     <script src="libs/kePrint/kePrint.js"></script>
@@ -14,10 +15,10 @@
 class: center, middle, inverse, title-slide
 
 # Introduction aux méthodes quantitatives avec R
-## statistique et cartographie
-### J. Migozzi
+## Statistiques
+### R. Leconte
 ### Ecole Normale Supérieure
-### 28/09/2020
+### 24/09/2021
 
 ---
 
@@ -30,12 +31,15 @@ class: inverse, center, middle
 
 # Géographie : un tournant numérique ?
 
+&lt;img src="img/moredata.png" width="80%" style="display: block; margin: auto;" /&gt;
+
+
 ---
 
 
-# Un monde de données
+# Toujours plus de données 
 
-- Toujours plus de données (spatiales) 
+- Ouverture et numérisation des données 
 
   - des données statistiques : INSEE, UE, communes... 
   - des données picturales : images satellites, photographies aériennes... ;
@@ -46,6 +50,7 @@ class: inverse, center, middle
 - De nouvelles sources de données numériques
   - réseaux sociaux : Facebook, Twitter, Instagram
   - plateformes : Uber, LeBonCoin, Yelp, Google Maps...
+  - projets contributifs : OpenStreetMap, Wikidata...  
 
 
 
@@ -55,8 +60,11 @@ class: inverse, center, middle
 
 - Le développement des Humanités Numériques transforme les champs scientifiques et professionnels
 
-- Roth, Camille. 2019. “[Digital, Digitized, and Numerical Humanities.](https://academic.oup.com/dsh/article-abstract/34/3/616/5161109)” _Digital Scholarship in the Humanities_ 
-
+- Roth Camille. 2019. “[Digital, Digitized, and Numerical Humanities.](https://academic.oup.com/dsh/article-abstract/34/3/616/5161109)” _Digital Scholarship in the Humanities_ 
+- Ash J, Kitchin R, Leszczynski A. 2018. “[Digital turn, digital geographies ?](https://journals.sagepub.com/doi/10.1177/0309132516664800)” _Progress in Human Geography_
+  - Le déploiement des instruments numériques dans les pratiques de recherche conduit à un renouvellement des problématiques de modélisation et de visualisation des phénomènes géographiques ; 
+  - Les données numériques (contenus du web, traces numériques) pour appréhender des comportements et dynamiques spatiales ;
+  - Le rôle du numérique dans la transformation des territoires.
 ---
 
 # Des sciences sociales : un tournant numérique 
@@ -77,16 +85,29 @@ Compter, classer, mesurer, modéliser : geste quantitatif au coeur de la géogra
 
 --
 - cartographie
-- analyse spatiale
+
+
+&lt;div class="figure" style="text-align: center"&gt;
+&lt;img src="img/carto.png" alt="Une des premières cartes statistiques (1798)" width="60%" /&gt;
+&lt;p class="caption"&gt;Une des premières cartes statistiques (1798)&lt;/p&gt;
+&lt;/div&gt;
 
 --
+---
+
+- analyse spatiale
+
+&lt;blockquote&gt;
+Everything is related to everything else, but near things are more related than distant things.right[-- &lt;cite&gt;W. Tobler, 1970, _Economic Geography_&lt;/cite&gt;]
+&lt;/blockquote&gt;
+---
 
 ### Années 1950-1960 : révolution quantitative
 
 --
-- Recherche de lois générales dans l'organisation de l'espace
-- Essor de la _regional science_, de l'économétrie spatiale
-- Modélisation : réseaux de transport, systèmes urbains etc.
+- Une science nomothétique : recherche des lois générales de l'organisation de l'espace
+- Une science explicative : modélisation 
+- Une science appliquée : essor de la _regional science_, de l'économétrie spatiale
 
 --
 
@@ -155,11 +176,11 @@ class: inverse, center, middle
 
 - Des ressources en ligne :
   - [Introduction à R et au *tidyverse*](https://juba.github.io/tidyverse/index.html), de Julien Barnier
+  - [utilitR](https://www.utilitr.org/), de l'INSEE
+  - [Rzine](https://rzine.fr/), du CIST
   - [Geocomputation with R](https://geocompr.robinlovelace.net/), de Lovelace, Nowosad et Muenchow
-  - [R et Espace](https://framabook.org/r-et-espace/)
-  - [R for Data Science](https://r4ds.had.co.nz/l), de Garrett Grolemund et Hadley Wickham
   - [Data Visualization : A practical introduction](https://socviz.co/), de Kieran Healy
-  - [Bit by Bit: Social Research in the Digital Age](https://www.bitbybitbook.com/), de Matthew Salganik 
+
   
   
 
@@ -169,18 +190,78 @@ class: inverse, center, middle
 # Les objectifs de ce cours
 
 
-1. Formation aux méthodes et normes de la statistique et de la cartographie
+Formation aux méthodes et normes de la statistique et de la visualisation (dont cartographique) par la _pratique_ du code dans l'environnement RStudio.
 
-1. Formation à la _pratique_ du code et à l'environnement RStudio
+1. La géographie dans un tournant numérique: premier saut dans R.
+2. De la donnée à l'information statisitique: mise en forme.
+3. Décrire et résumer l'inforation statistique. 
+4. Modéliser une relation entre variables. 
+5. Données spatiales et information géographique. 
+6. Cartographier une distribution. 
+7. Modélisation spatiale. 
+8. Rattraper notre retard ! 
+
+
 
 ---
 class: inverse, center, middle
 
-# Les statistiques : éléments généraux de définition
+# Les statistiques avec R : éléments généraux de définition et manipulations élémentaires 
 
 ---
 
-# Eléments de définition
+## Découvrir R Studio
+
+--
+
+### Démarrer RStudio depuis le bureau
+
+&lt;img src="img/50318_1516370386_scr.jpg" width="75%" style="display: block; margin: auto;" /&gt;
+
+---
+## La console : une grosse calculette
+
+- Additioner/Multiplier/Diviser 5 et 4 ; 
+- Utiliser la touche `Entrée` pour valider la commande
+
+---
+## L'éditeur de code 
+
+### Une partition 
+
+- Fichier texte qui regroupe l'ensemble des commandes à exécuter (différents formats)
+- Utilité : garder trace de tout ce que l'on a effectué. 
+- Script : garant de la reproductibilité. 
+- Créer un fichier de code : sélectionner le menu `File`, puis `New file` et `R Markdown`
+---
+
+### Le Markdown: à la fois script, bloc-note et fenêtre graphique
+
+- Un outil tout-en-un pour : 
+  - prendre des notes
+  - coder 
+  - afficher et mettre en forme les résultats de l'analyse
+  - communiquer son travail en HTML ou PDF
+  
+
+&lt;img src="img/rmd.png" width="70%" style="display: block; margin: auto;" /&gt;
+
+---
+
+- Pour être réutilisable et communicable, un script doit être structuré, aéré, commenté
+  - Compléter l'entête du .rmd
+  - Enregistrer le .rmd
+  - Insérer un premier titre et un sous-titre
+  - Insérer un bloc de code (chunk)
+
+
+
+---
+
+# Les statistiques
+
+
+## Eléments de définition
 
 - des données numériques, collectées par une institution publique/privée, ou par vous même...
 
@@ -191,17 +272,6 @@ class: inverse, center, middle
 
     - la _statistique descriptive_ : résumer l'information sur un ensemble d'éléments
     - la _statistique inférentielle_ : généraliser à de grands ensembles d'éléments des résultats obtenus sur un  échantillon. 
-
-
-
----
-
-# L'information géographique
-
-&lt;blockquote&gt;
-Une information est dite géographique lorsqu'elle se rapporte à un ou plusieurs lieux de la surface terrestre. C'est une information localisée et repérée, ou encore "géocodée"
-.right[-- &lt;cite&gt;Béguin &amp; Pumain, 2010&lt;/cite&gt;]
-&lt;/blockquote&gt;
 
 
 ---
@@ -229,167 +299,20 @@ Une information est dite géographique lorsqu'elle se rapporte à un ou plusieur
 
 ---
 
-## Les types de variable : 2 groupes principaux
+# Les types de variable : 2 groupes principaux
 
-&lt;img src="img/Variable.PNG" width="80%" style="display: block; margin: auto;" /&gt;
-
-
-
----
-# La structure des données 
-
-## Le tableau élémentaire
-
-- Un tableau qui décrit un ensemble d'individus à l'aide d'un ensemble de variables ;
-- Les lignes correspondent aux individus ;
-- Les colonnes aux variables ; 
-- La première colonne est généralement réservé à un **identifiant**.
-
----
-class: middle, center
-
-# Exercice 
-
-Décrivez le tableau suivant :
-
-&lt;table class="table table-striped" style="font-size: 16px; margin-left: auto; margin-right: auto;"&gt;
- &lt;thead&gt;
-  &lt;tr&gt;
-   &lt;th style="text-align:left;"&gt; Pays &lt;/th&gt;
-   &lt;th style="text-align:left;"&gt; Continent &lt;/th&gt;
-   &lt;th style="text-align:right;"&gt; Annee &lt;/th&gt;
-   &lt;th style="text-align:right;"&gt; Esperancedevie &lt;/th&gt;
-   &lt;th style="text-align:right;"&gt; Population &lt;/th&gt;
-   &lt;th style="text-align:right;"&gt; PIBparhabitant &lt;/th&gt;
-  &lt;/tr&gt;
- &lt;/thead&gt;
-&lt;tbody&gt;
-  &lt;tr&gt;
-   &lt;td style="text-align:left;"&gt; Chad &lt;/td&gt;
-   &lt;td style="text-align:left;"&gt; Africa &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 2007 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 50.651 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 10238807 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 1704.0637 &lt;/td&gt;
-  &lt;/tr&gt;
-  &lt;tr&gt;
-   &lt;td style="text-align:left;"&gt; Oman &lt;/td&gt;
-   &lt;td style="text-align:left;"&gt; Asia &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 2007 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 75.640 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 3204897 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 22316.1929 &lt;/td&gt;
-  &lt;/tr&gt;
-  &lt;tr&gt;
-   &lt;td style="text-align:left;"&gt; Norway &lt;/td&gt;
-   &lt;td style="text-align:left;"&gt; Europe &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 2007 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 80.196 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 4627926 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 49357.1902 &lt;/td&gt;
-  &lt;/tr&gt;
-  &lt;tr&gt;
-   &lt;td style="text-align:left;"&gt; Portugal &lt;/td&gt;
-   &lt;td style="text-align:left;"&gt; Europe &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 2007 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 78.098 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 10642836 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 20509.6478 &lt;/td&gt;
-  &lt;/tr&gt;
-  &lt;tr&gt;
-   &lt;td style="text-align:left;"&gt; Equatorial Guinea &lt;/td&gt;
-   &lt;td style="text-align:left;"&gt; Africa &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 2007 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 51.579 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 551201 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 12154.0897 &lt;/td&gt;
-  &lt;/tr&gt;
-  &lt;tr&gt;
-   &lt;td style="text-align:left;"&gt; Burundi &lt;/td&gt;
-   &lt;td style="text-align:left;"&gt; Africa &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 2007 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 49.580 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 8390505 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 430.0707 &lt;/td&gt;
-  &lt;/tr&gt;
-  &lt;tr&gt;
-   &lt;td style="text-align:left;"&gt; Sri Lanka &lt;/td&gt;
-   &lt;td style="text-align:left;"&gt; Asia &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 2007 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 72.396 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 20378239 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 3970.0954 &lt;/td&gt;
-  &lt;/tr&gt;
-  &lt;tr&gt;
-   &lt;td style="text-align:left;"&gt; Iraq &lt;/td&gt;
-   &lt;td style="text-align:left;"&gt; Asia &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 2007 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 59.545 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 27499638 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 4471.0619 &lt;/td&gt;
-  &lt;/tr&gt;
-  &lt;tr&gt;
-   &lt;td style="text-align:left;"&gt; Zimbabwe &lt;/td&gt;
-   &lt;td style="text-align:left;"&gt; Africa &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 2007 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 43.487 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 12311143 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 469.7093 &lt;/td&gt;
-  &lt;/tr&gt;
-  &lt;tr&gt;
-   &lt;td style="text-align:left;"&gt; Guinea &lt;/td&gt;
-   &lt;td style="text-align:left;"&gt; Africa &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 2007 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 56.007 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 9947814 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 942.6542 &lt;/td&gt;
-  &lt;/tr&gt;
-&lt;/tbody&gt;
-&lt;tfoot&gt;&lt;tr&gt;&lt;td style="padding: 0; border: 0;" colspan="100%"&gt;
-&lt;span style="font-style: italic;"&gt;Source : &lt;/span&gt; &lt;sup&gt;&lt;/sup&gt; Gapminder&lt;/td&gt;&lt;/tr&gt;&lt;/tfoot&gt;
-&lt;/table&gt;
-
-
----
-class: inverse, center, middle
-
-# Prise en main de RStudio
-
+&lt;img src="img/TypedeCaractere.jpg" width="80%" style="display: block; margin: auto;" /&gt;
 ---
 
-### Téléchargez R et RStudio 
 
-- Aller sur Google et cherchez "télécharger R"
-- Puis faites de même pour RStudio
+# Les types de données dans R
 
---
-
-### Démarrer RStudio depuis le bureau
-
-&lt;img src="img/50318_1516370386_scr.jpg" width="75%" style="display: block; margin: auto;" /&gt;
-
----
-## La console : une grosse calculette
-
-- Additioner/Multiplier/Diviser 5 et 4 ; 
-- Utiliser la touche `Entrée` pour valider la commande
-
----
-
-# Structure de R 
-
-&lt;blockquote&gt;
-Everything that exists is an object.  
-     Everything that happens is a function call. 
-.right[-- &lt;cite&gt;John Chambers&lt;/cite&gt;]
-&lt;/blockquote&gt;
-
-## Les différents types de données 
 
 - **numeric** : valeurs décimale (10.1)
 - **integer** : nombre entier (10)
 - **logical** : valeurs booléennes (TRUE, FALSE)
 - **characters** : du texte (aussi appelé *string*). Pour déclarer une donnée de type texte, il faut utiliser les "quotation marks"
+
 
 ---
 
@@ -441,7 +364,23 @@ y
 ```
 
 ---
-# Le vecteur
+
+# La structure des données 
+
+## Le tableau élémentaire
+
+- Un tableau qui décrit un ensemble d'individus à l'aide d'un ensemble de variables ;
+- Les lignes correspondent aux individus ;
+- Les colonnes aux variables ; 
+- La première colonne est généralement réservé à un **identifiant**.
+
+
+---
+
+# La structure des données dans R
+
+
+## Le vecteur
 
 Un vecteur est une liste d'éléments étant tous du même type.
 
@@ -475,7 +414,7 @@ x/10
 ```
 
 ---
-# Exercice
+## Exercice
 
 - Stockez dans un vecteur `distance` les valeurs suivantes exprimées en mètres : 
 
@@ -491,7 +430,7 @@ x/10
 - Assignez une valeur manquante à la 2e valeur du vecteur `distance` (NA)
 
 ---
-# Solution 
+## Solution 
 
 - Stockez dans un vecteur `distance` les valeurs suivantes exprimées en mètres : 
 
@@ -521,7 +460,7 @@ distance &lt;- NA
 
 C'est un ensemble de vecteurs !
 
-&lt;table class="table table-striped" style="font-size: 16px; width: auto !important; margin-left: auto; margin-right: auto;"&gt;
+&lt;table class="table table-striped" style="font-size: 16px; width: auto !important; margin-left: auto; margin-right: auto;border-bottom: 0;"&gt;
  &lt;thead&gt;
   &lt;tr&gt;
    &lt;th style="text-align:left;"&gt; Pays &lt;/th&gt;
@@ -534,12 +473,28 @@ C'est un ensemble de vecteurs !
  &lt;/thead&gt;
 &lt;tbody&gt;
   &lt;tr&gt;
-   &lt;td style="text-align:left;"&gt; Indonesia &lt;/td&gt;
-   &lt;td style="text-align:left;"&gt; Asia &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Ethiopia &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Africa &lt;/td&gt;
    &lt;td style="text-align:right;"&gt; 2007 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 70.650 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 223547000 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 3540.6516 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 52.947 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 76511887 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 690.8056 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Central African Republic &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Africa &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2007 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 44.741 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 4369038 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 706.0165 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Rwanda &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Africa &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2007 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 46.242 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 8860588 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 863.0885 &lt;/td&gt;
   &lt;/tr&gt;
   &lt;tr&gt;
    &lt;td style="text-align:left;"&gt; Bulgaria &lt;/td&gt;
@@ -550,28 +505,44 @@ C'est un ensemble de vecteurs !
    &lt;td style="text-align:right;"&gt; 10680.7928 &lt;/td&gt;
   &lt;/tr&gt;
   &lt;tr&gt;
-   &lt;td style="text-align:left;"&gt; Somalia &lt;/td&gt;
-   &lt;td style="text-align:left;"&gt; Africa &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 2007 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 48.159 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 9118773 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 926.1411 &lt;/td&gt;
-  &lt;/tr&gt;
-  &lt;tr&gt;
-   &lt;td style="text-align:left;"&gt; Iceland &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Norway &lt;/td&gt;
    &lt;td style="text-align:left;"&gt; Europe &lt;/td&gt;
    &lt;td style="text-align:right;"&gt; 2007 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 81.757 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 301931 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 36180.7892 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 80.196 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 4627926 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 49357.1902 &lt;/td&gt;
   &lt;/tr&gt;
   &lt;tr&gt;
-   &lt;td style="text-align:left;"&gt; Indonesia &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Finland &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Europe &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2007 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 79.313 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 5238460 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 33207.0844 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Nigeria &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Africa &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2007 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 46.859 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 135031164 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2013.9773 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Afghanistan &lt;/td&gt;
    &lt;td style="text-align:left;"&gt; Asia &lt;/td&gt;
    &lt;td style="text-align:right;"&gt; 2007 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 70.650 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 223547000 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 3540.6516 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 43.828 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 31889923 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 974.5803 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Slovak Republic &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Europe &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2007 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 74.663 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 5447502 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 18678.3144 &lt;/td&gt;
   &lt;/tr&gt;
   &lt;tr&gt;
    &lt;td style="text-align:left;"&gt; Bosnia and Herzegovina &lt;/td&gt;
@@ -581,40 +552,8 @@ C'est un ensemble de vecteurs !
    &lt;td style="text-align:right;"&gt; 4552198 &lt;/td&gt;
    &lt;td style="text-align:right;"&gt; 7446.2988 &lt;/td&gt;
   &lt;/tr&gt;
-  &lt;tr&gt;
-   &lt;td style="text-align:left;"&gt; Cote d'Ivoire &lt;/td&gt;
-   &lt;td style="text-align:left;"&gt; Africa &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 2007 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 48.328 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 18013409 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 1544.7501 &lt;/td&gt;
-  &lt;/tr&gt;
-  &lt;tr&gt;
-   &lt;td style="text-align:left;"&gt; Niger &lt;/td&gt;
-   &lt;td style="text-align:left;"&gt; Africa &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 2007 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 56.867 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 12894865 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 619.6769 &lt;/td&gt;
-  &lt;/tr&gt;
-  &lt;tr&gt;
-   &lt;td style="text-align:left;"&gt; South Africa &lt;/td&gt;
-   &lt;td style="text-align:left;"&gt; Africa &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 2007 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 49.339 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 43997828 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 9269.6578 &lt;/td&gt;
-  &lt;/tr&gt;
-  &lt;tr&gt;
-   &lt;td style="text-align:left;"&gt; Mali &lt;/td&gt;
-   &lt;td style="text-align:left;"&gt; Africa &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 2007 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 54.467 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 12031795 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 1042.5816 &lt;/td&gt;
-  &lt;/tr&gt;
 &lt;/tbody&gt;
-&lt;tfoot&gt;&lt;tr&gt;&lt;td style="padding: 0; border: 0;" colspan="100%"&gt;
+&lt;tfoot&gt;&lt;tr&gt;&lt;td style="padding: 0; " colspan="100%"&gt;
 &lt;span style="font-style: italic;"&gt;Source : &lt;/span&gt; &lt;sup&gt;&lt;/sup&gt; Gapminder&lt;/td&gt;&lt;/tr&gt;&lt;/tfoot&gt;
 &lt;/table&gt;
 
@@ -717,6 +656,112 @@ df$Type
 
 ---
 
+# Exercice 
+
+Décrivez le tableau suivant :
+
+&lt;table class="table table-striped" style="font-size: 16px; margin-left: auto; margin-right: auto;border-bottom: 0;"&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt; Pays &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Continent &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Annee &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Esperancedevie &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Population &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; PIBparhabitant &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Belgium &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Europe &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2007 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 79.441 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 10392226 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 33692.6051 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Mozambique &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Africa &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2007 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 42.082 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 19951656 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 823.6856 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Lesotho &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Africa &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2007 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 42.592 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2012649 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1569.3314 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Panama &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Americas &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2007 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 75.537 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3242173 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 9809.1856 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Costa Rica &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Americas &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2007 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 78.782 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 4133884 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 9645.0614 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Equatorial Guinea &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Africa &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2007 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 51.579 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 551201 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 12154.0897 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; West Bank and Gaza &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Asia &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2007 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 73.422 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 4018332 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3025.3498 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Thailand &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Asia &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2007 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 70.616 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 65068149 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 7458.3963 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Montenegro &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Europe &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2007 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 74.543 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 684736 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 9253.8961 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Swaziland &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Africa &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2007 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 39.613 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1133066 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 4513.4806 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;tfoot&gt;&lt;tr&gt;&lt;td style="padding: 0; " colspan="100%"&gt;
+&lt;span style="font-style: italic;"&gt;Source : &lt;/span&gt; &lt;sup&gt;&lt;/sup&gt; Gapminder&lt;/td&gt;&lt;/tr&gt;&lt;/tfoot&gt;
+&lt;/table&gt;
+
+
+---
+class: inverse, center, middle
+
+
 ## Importer des données dans R
 
 - Un fichier au format csv (le plus courant) :
@@ -794,35 +839,22 @@ mean(distance na.rm = T) # = na.remove = TRUE
 ```
 ---
 
-## Le script
 
-### Une partition 
+# Exercice
 
-- Un fichier texte qui regroupe l'ensemble des commandes à exécuter
-- Utilité : garder trace de tout ce que l'on effectué. 
-- Script : garant de la reproductibiliité. 
-- Créer un script : sélectionner le menu `File`, puis `New file` et `R script`
-
-
-### Le script : les bonnes pratiques
-
-- Enregistrer ses scripts au format UTF-8
-- Donner des noms clairs à ses scripts
-- Utiliser le caractère # pour commenter son script
-- Proposer un en-tête
-- Annoter le plus possible
-- Constituer des sections internes en utilisant 4 fois le signe "-" : "----"
-- Principe : le script doit être clair et pouvoir être éxecuté d'un seul tenant
+ 
+  - Importer le fichier csv `murders`. 
+  - Calculer avec une fonction le nombre total de meurtres aux Etats-Unis.
+  - Calculer le nb de meurtres pour 100 000 habitants. 
+  - Identifier la plus forte et la plus faible valeur. 
+  - Calculer l'étendue de la distribution (maximum-minimum).
+  - Chacune des étapes doit être correctement mise en forme et commentée dans le Markdown. 
 
 ---
 
 # Exercice
 
-- Envoyer *avant* samedi 3 octobre un script au format "NOM_Prenom_Intro.R" qui : 
-  - Ouvre le fichier csv `murders`. 
-  - Calcule avec une fonction le nombre total de meurtres aux Etats-Unis.
-  - Identifie l'Etat le plus meurtrier et le moins meurtrier.
-- Chacune des étapes doit être commentée (en utilisant le signe #)
+Choisir un jeu de données ouvertes disponible en ligne et l'importer. 
 
 ---
 
@@ -831,6 +863,8 @@ class: center, middle
 # Merci !
 
 Slides crées avec le package [**xaringan**](https://github.com/yihui/xaringan).
+D'après [jmigozzi/statsmappingwithR](https://github.com/jmigozzi/statsmappingwithR)
+
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>

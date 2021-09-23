@@ -1,9 +1,9 @@
 ---
 title: "Introduction aux méthodes quantitatives avec R"
-subtitle: "statistique et cartographie"
-author: "J. Migozzi"
+subtitle: "Statistiques"
+author: "R. Leconte"
 institute: "Ecole Normale Supérieure"
-date: "28/09/2020"
+date: "24/09/2021"
 output:
   xaringan::moon_reader:
     #yolo: true
@@ -32,12 +32,18 @@ library(kableExtra)
 
 # Géographie : un tournant numérique ?
 
+```{r, echo = F, fig.align="center", out.width="80%"}
+
+include_graphics("img/moredata.png")
+```
+
+
 ---
 
 
-# Un monde de données
+# Toujours plus de données 
 
-- Toujours plus de données (spatiales) 
+- Ouverture et numérisation des données 
 
   - des données statistiques : INSEE, UE, communes... 
   - des données picturales : images satellites, photographies aériennes... ;
@@ -48,6 +54,7 @@ library(kableExtra)
 - De nouvelles sources de données numériques
   - réseaux sociaux : Facebook, Twitter, Instagram
   - plateformes : Uber, LeBonCoin, Yelp, Google Maps...
+  - projets contributifs : OpenStreetMap, Wikidata...  
 
 
 
@@ -57,8 +64,11 @@ library(kableExtra)
 
 - Le développement des Humanités Numériques transforme les champs scientifiques et professionnels
 
-- Roth, Camille. 2019. “[Digital, Digitized, and Numerical Humanities.](https://academic.oup.com/dsh/article-abstract/34/3/616/5161109)” _Digital Scholarship in the Humanities_ 
-
+- Roth Camille. 2019. “[Digital, Digitized, and Numerical Humanities.](https://academic.oup.com/dsh/article-abstract/34/3/616/5161109)” _Digital Scholarship in the Humanities_ 
+- Ash J, Kitchin R, Leszczynski A. 2018. “[Digital turn, digital geographies ?](https://journals.sagepub.com/doi/10.1177/0309132516664800)” _Progress in Human Geography_
+  - Le déploiement des instruments numériques dans les pratiques de recherche conduit à un renouvellement des problématiques de modélisation et de visualisation des phénomènes géographiques ; 
+  - Les données numériques (contenus du web, traces numériques) pour appréhender des comportements et dynamiques spatiales ;
+  - Le rôle du numérique dans la transformation des territoires.
 ---
 
 # Des sciences sociales : un tournant numérique 
@@ -79,16 +89,29 @@ Compter, classer, mesurer, modéliser : geste quantitatif au coeur de la géogra
 
 --
 - cartographie
-- analyse spatiale
+
+
+```{r, echo = F, fig.align="center", fig.cap = "Une des premières cartes statistiques (1798)", out.width="60%"}
+
+include_graphics("img/carto.png")
+```
 
 --
+---
+
+- analyse spatiale
+
+<blockquote>
+Everything is related to everything else, but near things are more related than distant things.right[-- <cite>W. Tobler, 1970, _Economic Geography_</cite>]
+</blockquote>
+---
 
 ### Années 1950-1960 : révolution quantitative
 
 --
-- Recherche de lois générales dans l'organisation de l'espace
-- Essor de la _regional science_, de l'économétrie spatiale
-- Modélisation : réseaux de transport, systèmes urbains etc.
+- Une science nomothétique : recherche des lois générales de l'organisation de l'espace
+- Une science explicative : modélisation 
+- Une science appliquée : essor de la _regional science_, de l'économétrie spatiale
 
 --
 
@@ -160,11 +183,11 @@ include_graphics("img/data-science-workflow.png")
 
 - Des ressources en ligne :
   - [Introduction à R et au *tidyverse*](https://juba.github.io/tidyverse/index.html), de Julien Barnier
+  - [utilitR](https://www.utilitr.org/), de l'INSEE
+  - [Rzine](https://rzine.fr/), du CIST
   - [Geocomputation with R](https://geocompr.robinlovelace.net/), de Lovelace, Nowosad et Muenchow
-  - [R et Espace](https://framabook.org/r-et-espace/)
-  - [R for Data Science](https://r4ds.had.co.nz/l), de Garrett Grolemund et Hadley Wickham
   - [Data Visualization : A practical introduction](https://socviz.co/), de Kieran Healy
-  - [Bit by Bit: Social Research in the Digital Age](https://www.bitbybitbook.com/), de Matthew Salganik 
+
   
   
 ```{r eval=FALSE, tidy=FALSE, echo = F}
@@ -176,18 +199,86 @@ devtools::install_github("yihui/xaringan")
 # Les objectifs de ce cours
 
 
-1. Formation aux méthodes et normes de la statistique et de la cartographie
+Formation aux méthodes et normes de la statistique et de la visualisation (dont cartographique) par la _pratique_ du code dans l'environnement RStudio.
 
-1. Formation à la _pratique_ du code et à l'environnement RStudio
+1. La géographie dans un tournant numérique: premier saut dans R.
+2. De la donnée à l'information statisitique: mise en forme.
+3. Décrire et résumer l'inforation statistique. 
+4. Modéliser une relation entre variables. 
+5. Données spatiales et information géographique. 
+6. Cartographier une distribution. 
+7. Modélisation spatiale. 
+8. Rattraper notre retard ! 
+
+
 
 ---
 class: inverse, center, middle
 
-# Les statistiques : éléments généraux de définition
+# Les statistiques avec R : éléments généraux de définition et manipulations élémentaires 
 
 ---
 
-# Eléments de définition
+## Découvrir R Studio
+
+--
+
+### Démarrer RStudio depuis le bureau
+
+```{r, echo = FALSE, fig.align = "center", out.width = "75%"}
+
+include_graphics('img/50318_1516370386_scr.jpg')
+# include_graphics(img/50318_1516370386_scr.jpg)
+```
+
+---
+## La console : une grosse calculette
+
+- Additioner/Multiplier/Diviser 5 et 4 ; 
+- Utiliser la touche `Entrée` pour valider la commande
+
+---
+## L'éditeur de code 
+
+### Une partition 
+
+- Fichier texte qui regroupe l'ensemble des commandes à exécuter (différents formats)
+- Utilité : garder trace de tout ce que l'on a effectué. 
+- Script : garant de la reproductibilité. 
+- Créer un fichier de code : sélectionner le menu `File`, puis `New file` et `R Markdown`
+---
+
+### Le Markdown: à la fois script, bloc-note et fenêtre graphique
+
+- Un outil tout-en-un pour : 
+  - prendre des notes
+  - coder 
+  - afficher et mettre en forme les résultats de l'analyse
+  - communiquer son travail en HTML ou PDF
+  
+
+```{r, echo = FALSE, fig.align = "center", out.width = "70%"}
+
+include_graphics('img/rmd.png')
+
+```
+
+---
+
+- Pour être réutilisable et communicable, un script doit être structuré, aéré, commenté
+  - Compléter l'entête du .rmd
+  - Enregistrer le .rmd
+  - Insérer un premier titre et un sous-titre
+  - Insérer un bloc de code (chunk)
+
+
+
+---
+
+# Les statistiques
+
+
+## Eléments de définition
 
 - des données numériques, collectées par une institution publique/privée, ou par vous même...
 
@@ -198,17 +289,6 @@ class: inverse, center, middle
 
     - la _statistique descriptive_ : résumer l'information sur un ensemble d'éléments
     - la _statistique inférentielle_ : généraliser à de grands ensembles d'éléments des résultats obtenus sur un  échantillon. 
-
-
-
----
-
-# L'information géographique
-
-<blockquote>
-Une information est dite géographique lorsqu'elle se rapporte à un ou plusieurs lieux de la surface terrestre. C'est une information localisée et repérée, ou encore "géocodée"
-.right[-- <cite>Béguin & Pumain, 2010</cite>]
-</blockquote>
 
 
 ---
@@ -236,89 +316,24 @@ Une information est dite géographique lorsqu'elle se rapporte à un ou plusieur
 
 ---
 
-## Les types de variable : 2 groupes principaux
+# Les types de variable : 2 groupes principaux
 
 ```{r, echo = F, fig.align="center", out.width="80%"}
 
-include_graphics("img/Variable.PNG")
+include_graphics("img/TypedeCaractere.jpg")
+
 ```
-
-
-
----
-# La structure des données 
-
-## Le tableau élémentaire
-
-- Un tableau qui décrit un ensemble d'individus à l'aide d'un ensemble de variables ;
-- Les lignes correspondent aux individus ;
-- Les colonnes aux variables ; 
-- La première colonne est généralement réservé à un **identifiant**.
-
----
-class: middle, center
-
-# Exercice 
-
-Décrivez le tableau suivant :
-
-```{r , message = FALSE, warning = FALSE, echo = FALSE}
-library(gapminder)
-library(dplyr)
-library(kableExtra)
-      
-gapminder %>% filter(year == 2007) %>% distinct(country, .keep_all = T) %>% sample_n(10, replace = TRUE) %>%  
-  rename(Pays = country, Annee = year, Continent = continent, Esperancedevie = lifeExp, Population = pop, PIBparhabitant = gdpPercap) %>%
-  knitr::kable(format = 'html') %>%
-    kable_styling(bootstrap_options = "striped", full_width = T, font_size = 16) %>%
-   footnote(general  = "Gapminder", general_title = "Source : ", footnote_as_chunk = T)
-```
-
-
----
-class: inverse, center, middle
-
-# Prise en main de RStudio
-
 ---
 
-### Téléchargez R et RStudio 
 
-- Aller sur Google et cherchez "télécharger R"
-- Puis faites de même pour RStudio
+# Les types de données dans R
 
---
-
-### Démarrer RStudio depuis le bureau
-
-```{r, echo = FALSE, fig.align = "center", out.width = "75%"}
-
-include_graphics('img/50318_1516370386_scr.jpg')
-# include_graphics(img/50318_1516370386_scr.jpg)
-```
-
----
-## La console : une grosse calculette
-
-- Additioner/Multiplier/Diviser 5 et 4 ; 
-- Utiliser la touche `Entrée` pour valider la commande
-
----
-
-# Structure de R 
-
-<blockquote>
-Everything that exists is an object.  
-     Everything that happens is a function call. 
-.right[-- <cite>John Chambers</cite>]
-</blockquote>
-
-## Les différents types de données 
 
 - **numeric** : valeurs décimale (10.1)
 - **integer** : nombre entier (10)
 - **logical** : valeurs booléennes (TRUE, FALSE)
 - **characters** : du texte (aussi appelé *string*). Pour déclarer une donnée de type texte, il faut utiliser les "quotation marks"
+
 
 ---
 
@@ -347,7 +362,23 @@ y
 ```
 
 ---
-# Le vecteur
+
+# La structure des données 
+
+## Le tableau élémentaire
+
+- Un tableau qui décrit un ensemble d'individus à l'aide d'un ensemble de variables ;
+- Les lignes correspondent aux individus ;
+- Les colonnes aux variables ; 
+- La première colonne est généralement réservé à un **identifiant**.
+
+
+---
+
+# La structure des données dans R
+
+
+## Le vecteur
 
 Un vecteur est une liste d'éléments étant tous du même type.
 
@@ -370,7 +401,7 @@ x/10
 ```
 
 ---
-# Exercice
+## Exercice
 
 - Stockez dans un vecteur `distance` les valeurs suivantes exprimées en mètres : 
 
@@ -385,7 +416,7 @@ x/10
 - Assignez une valeur manquante à la 2e valeur du vecteur `distance` (NA)
 
 ---
-# Solution 
+## Solution 
 
 - Stockez dans un vecteur `distance` les valeurs suivantes exprimées en mètres : 
 
@@ -473,6 +504,27 @@ df$Type
 
 ---
 
+# Exercice 
+
+Décrivez le tableau suivant :
+
+```{r , message = FALSE, warning = FALSE, echo = FALSE}
+library(gapminder)
+library(dplyr)
+library(kableExtra)
+      
+gapminder %>% filter(year == 2007) %>% distinct(country, .keep_all = T) %>% sample_n(10, replace = TRUE) %>%  
+  rename(Pays = country, Annee = year, Continent = continent, Esperancedevie = lifeExp, Population = pop, PIBparhabitant = gdpPercap) %>%
+  knitr::kable(format = 'html') %>%
+    kable_styling(bootstrap_options = "striped", full_width = T, font_size = 16) %>%
+   footnote(general  = "Gapminder", general_title = "Source : ", footnote_as_chunk = T)
+```
+
+
+---
+class: inverse, center, middle
+
+
 ## Importer des données dans R
 
 - Un fichier au format csv (le plus courant) :
@@ -542,35 +594,22 @@ mean(distance na.rm = T) # = na.remove = TRUE
 ```
 ---
 
-## Le script
 
-### Une partition 
+# Exercice
 
-- Un fichier texte qui regroupe l'ensemble des commandes à exécuter
-- Utilité : garder trace de tout ce que l'on effectué. 
-- Script : garant de la reproductibiliité. 
-- Créer un script : sélectionner le menu `File`, puis `New file` et `R script`
-
-
-### Le script : les bonnes pratiques
-
-- Enregistrer ses scripts au format UTF-8
-- Donner des noms clairs à ses scripts
-- Utiliser le caractère # pour commenter son script
-- Proposer un en-tête
-- Annoter le plus possible
-- Constituer des sections internes en utilisant 4 fois le signe "-" : "----"
-- Principe : le script doit être clair et pouvoir être éxecuté d'un seul tenant
+ 
+  - Importer le fichier csv `murders`. 
+  - Calculer avec une fonction le nombre total de meurtres aux Etats-Unis.
+  - Calculer le nb de meurtres pour 100 000 habitants. 
+  - Identifier la plus forte et la plus faible valeur. 
+  - Calculer l'étendue de la distribution (maximum-minimum).
+  - Chacune des étapes doit être correctement mise en forme et commentée dans le Markdown. 
 
 ---
 
 # Exercice
 
-- Envoyer *avant* samedi 3 octobre un script au format "NOM_Prenom_Intro.R" qui : 
-  - Ouvre le fichier csv `murders`. 
-  - Calcule avec une fonction le nombre total de meurtres aux Etats-Unis.
-  - Identifie l'Etat le plus meurtrier et le moins meurtrier.
-- Chacune des étapes doit être commentée (en utilisant le signe #)
+Choisir un jeu de données ouvertes disponible en ligne et l'importer. 
 
 ---
 
@@ -579,4 +618,5 @@ class: center, middle
 # Merci !
 
 Slides crées avec le package [**xaringan**](https://github.com/yihui/xaringan).
+D'après [jmigozzi/statsmappingwithR](https://github.com/jmigozzi/statsmappingwithR)
 
