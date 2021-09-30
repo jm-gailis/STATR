@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Enrichir et manipuler des données</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="R. Leconte" />
+    <meta name="date" content="2021-01-10" />
+    <script src="libs/header-attrs-2.11/header-attrs.js"></script>
+    <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
+    <link href="libs/remark-css-0.0.1/default-fonts.css" rel="stylesheet" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Enrichir et manipuler des données
+### R. Leconte
+### Ecole Normale Supérieure
+### 01/10/2021
+
+---
+
+class: inverse, center, middle
+# Validation du cours
+
+---
+# Validation du cours
+
+- Assiduité
+
+- Un rapport portant sur un jeu de données de votre choix et présentant des éléments d'analyse statistique et de visualisation des données
+
+- Un exercice utile dans le cadre de votre formation: préparation d'un stage de terrain, chapitre de mémoire, pré-projet de thèse, rendu pour valider un cours à l'ENS ou à l'Université...
+
+- Contraintes:
+
+  - une problématique
+  - une réflexion critique sur les données employées: comment et par qui on t-elle été produite ? ce qu'elles permettent d'observer et ce qu'elles ne permettent pas etc.
+  - être intéralement rédigé en Rmarkdown
+  - mobiliser la statistique univariée **et** bivariée
+  - mobiliser la visualisation graphique **et** cartographique
+  
+- Rendu avant le 16 décembre 2021.
+
+---
+class: inverse, center, middle
+
+
+# Manipuler une table de données avec _dplyr_ 
+
+---
+## Le package _dplyr_
+
+Un package qui comporte une série de fonctions (ou verbes) qui permettent de manipuler tout objet dans R:
+
+- à partir des colonnes : _select_, _rename_, _mutate_ ; 
+- à partir des lignes : _filter_ ; 
+- pour réaliser des calculs groupés : _group_by_ et _summarise_
+
+Vouus pouvez consulter à ce propos les chapitres 6, 7 et 10 de [Introduction à R et au tidyverse](https://juba.github.io/tidyverse/06-tidyverse.html) de Julien Barnier.
+
+
+---
+## Charger le jeu de données et le package
+
+
+```r
+# appeler le package 
+library(dplyr)
+```
+
+```
+## 
+## Attachement du package : 'dplyr'
+```
+
+```
+## Les objets suivants sont masqués depuis 'package:stats':
+## 
+##     filter, lag
+```
+
+```
+## Les objets suivants sont masqués depuis 'package:base':
+## 
+##     intersect, setdiff, setequal, union
+```
+
+```r
+# importer les données
+mydata &lt;- read.csv("C:/Users/romai/Documents/ens_ulm/cours/STATR/statsmappingwithR-master/statsmappingwithR-master/03_DataWrangling/data2/paris_soc_eco.csv", header = TRUE, sep = ";")
+```
+
+
+
+---
+## Les verbes : _select_
+
+
+- Sélectionner une ou des variables : 
+
+
+```r
+# Syntaxe : on garde les colonnes NOM et TXCHOMA07 de l'objet "mydata"
+select(mydata, NOM, TXCHOMA07)
+```
+
+- Supprimer une ou des variables : 
+
+
+```r
+select(mydata, -REFEROUI)
+```
+
+- Sélectionner un _intervalle_ de variables : 
+
+
+```r
+select(mydata, CODGEO:Y)
+```
+
+---
+## Les verbes : _rename_
+
+
+
+```r
+rename(mydata,REVMED07 =  RFUCQ207)
+```
+
+
+Attention : pour sauvegarder les changements, il faut "écraser" le fichier existant en utilisant à nouveau le signe "&lt;-" ou créer un nouvel objet avec un nouveau nom. 
+
+---
+## Les verbes : _mutate_
+
+La fonction _mutate_ crée de nouvelles variables, généralement à partir de variables existantes.
+
+On peut donc additionner, soustraire, diviser _etc._ les variables pour en créer de nouvelles. 
+
+---
+## Les verbes : _mutate_
+
+La grammaire de _mutate_ : 
+
+
+```r
+mutate(data, NouvelleVariable = Var1 + Var2)
+```
+
+--
+### Exercice 
+
+Calculez la densité d'emplois par arrondissement. 
+
+---
+### Solution
+
+
+```r
+mydata &lt;- mutate(mydata, DENSEMP = EMPLOI06/SURF)
+```
+
+---
+### _mutate_ complexe
+
+Créer une nouvelle variable "Classe sociale"
+
+
+```r
+mydata &lt;- mutate(mydata, SOCLAS = 
+                   if_else(RFUCQ207 &gt; median(RFUCQ207), 
+                           "SUP", "INF"))
+```
+
+
+
+---
+## Bilan : manipuler des colonnes
+
+Les verbes _rename_, _mutate_, _select_ permettent de manipuler des colonnes, ou variables. 
+
+Ils permettent de manipuler un tableau sans utiliser les signes $ ou [ ].
+
+On peut ainsi utiliser ces fonctions pour préparer ses données
+
+Les deux lignes de code suivantes produisent le même résultat : créer une nouvelle variable à partir d'une variable existante, en passant du format _integer_ au format _character_.
+
+
+```r
+# Syntaxe de base sur R
+mydata$INSEE_COM &lt;- as.character(mydata$CODGEO)
+
+# Syntaxe du tidyverse
+mydata &lt;- mutate(mydata, INSEE_COM = as.character(CODGEO))
+```
+
+
+---
+## Les verbes : _filter_
+
+- Sélectionne des lignes d’une table selon une ou plusieurs conditions.
+
+- On filtre les individus (ou les lignes) selon leurs _modalités_, leurs _valeurs_.
+
+---
+## Les opérateurs
+
+Pour filtrer ces lignes, on utilise des [opérateurs](http://larmarange.github.io/analyse-R/conditions-et-comparaisons.html) : &lt;, &gt;, ==, !=, &amp; _etc._
+
+- Pour filtrer selon une variable catégorielle : 
+
+
+```r
+filter(data, Var1 == "TEXTE")
+```
+- Pour filtrer selon une variable quantitative : 
+
+
+```r
+filter(data, Var1 == 8) # est égal à 
+filter(data, Var1 &gt; 8) # est strictement supérieur à 
+filter(data, Var1 &gt;= 8) #inférieur ou égal à 
+```
+
+- On utilise l'opérateur _&amp;_ pour combiner les critères :
+
+
+```r
+filter(data, VarQuanti &gt; 8 &amp; VarQuali  == "TEXTE")
+```
+
+
+---
+# Exercice
+
+Sélectionner dans un nouvel objet : 
+  - les 4 premiers arrondissements de Paris ;
+  - les arrondissements dont le revenu médian est supérieur à la moyenne ;
+
+### Solution
+
+
+```r
+paris_centre &lt;- filter(mydata, INSEE_COM %in% c("75101", "75102", "75103", "75104"))
+paris_rich &lt;- filter(mydata, RFUCQ207 &gt; median(RFUCQ207))
+```
+
+
+---
+## Enchainer les opérations : le _pipe_ ou %&gt;%
+
+L'intérêt majeur de _dplyr_ tient à cette fonction : %&gt;%, dite _pipe_. 
+
+Le _pipe_ permet de combiner plusieurs opérations en une même séquence de tâches.
+
+Le raccourci clavier pour le pipe est CTRL + MAJ + M
+
+Principe : Le résultat de ce qui se trouve _à gauche_ du pipe est passé comme argument à ce qui se trouve _à droite_ :
+
+Julien Barnier propose des explications [ici](https://juba.github.io/tidyverse/10-dplyr.html#pipe).
+
+Décrivons la séquence suivante basée sur un _pipe_, qui crée un nouvel objet _paris_sf_, qui stockera la densité de population par département :
+
+
+```r
+paris_centre &lt;- mydata %&gt;% # choisir objet de départ
+    select(CODGEO, SURF, EMPLOI06, RFUCQ207) %&gt;% # sélectionner 3 colonnes 
+    filter(CODGEO %in% c(75101, 75102, 75103, 75104)) %&gt;% # filtrer les arrondissements centraux
+    mutate(Superficie = SURF/100) %&gt;% # convertir la superficie en Km²
+    mutate(Density = EMPLOI06/Superficie) # calculer densité d'emplois
+```
+
+---
+## Les fonctions _Group_by_ et _summarise_
+
+- La fonction _group_by_ regroupe les lignes  individus selon les modalités d'une ou plusieurs variables. 
+
+- Associée à la fonction _summarise_, on peut effectuer des calculs groupés : par exemple, calculer des sommes, des moyennes, des  par catégorie.
+
+
+```r
+paris_class &lt;- mydata %&gt;%
+  group_by(SOCLAS) %&gt;% #regroupe lignes par département
+  summarise(Actifs = sum(ACTOCC06), # total de population
+            TotalArrondissement = n(),
+            Chomage = mean(TXCHOMA07)) # compte le nombre d'unités
+```
+
+La fonction _sum_ calcule le total d'actifs par type d'arrondissement
+
+La fonction _n()_ compte le nombre d'entités pour chaque modalité
+
+La fonction _mean()_ calacule la moyenne. 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+---
+class: inverse, center, middle
+
+# Enrichir des données : réaliser des jointures attributaires
+
+
+
+---
+## Faire une jointure
+
+Il s'agit de "coller" un tableau de données à un autre. 
+
+Pour effectuer une jointure, il faut donc disposer d'une variable : 
+- commune aux deux objets ; 
+- avec un identifiant unique pour chaque individu ; 
+- de même format ( _character_ / _integer_ ).
+
+---
+# Exercice
+
+On veut ajouter des variables de population aux variables socio-économiques de Paris: 
+
+1. Charger paris_pop.csv
+2. Identifier la variable qu'ils ont en commun 
+2. vérifier que la variable en commun est de même nature
+
+---
+## Solution
+
+
+```r
+paris_pop &lt;- read.csv("C:/Users/romai/Documents/ens_ulm/cours/STATR/statsmappingwithR-master/statsmappingwithR-master/03_DataWrangling/data2/paris_pop.csv", sep = ";")
+```
+
+On peut vérifier avec la fonction _class_ :
+
+```r
+class(mydata$CODGEO) 
+```
+
+```
+## [1] "integer"
+```
+
+```r
+class(paris_pop$CODGEO) 
+```
+
+```
+## [1] "integer"
+```
+
+
+---
+## Jointure
+
+---
+## Réaliser une jointure : les fonctions _join_
+
+Il y a plusieurs types de jointures pour coller deux tableaux, ou deux objets
+
+---
+## La fonction _left_join_
+
+La fonction _left_join_ garde le premier objet et y "colle" les variables (ou colonnes) du 2e objet. 
+
+Elle garde *toutes* les lignes du premier objet : les lignes du 2e objet qui ne trouvent pas d'unités correspondantes sont éliminées. 
+
+L'ordre de la fonction est donc important : 
+
+- les variables de l'objet 2 sont transférées VERS l'objet 1.
+- En d'autres termes, les lignes de l'objet 1 reçoivent les variables de l'objet 2. 
+
+
+```r
+object &lt;- left_join(objet1, objet2, by = "IDENTIFIANT")
+```
+
+
+---
+
+# Exercice
+Réalisez une jointure entre les deux tables de données
+
+--
+## Solution 
+
+
+```r
+paris &lt;- left_join(mydata, #objet 1 
+                    paris_pop, #objet 2
+                    by = "CODGEO") # l'identifiant commun
+colnames(paris) #Vérifier si les variables ont été ajoutées
+```
+
+```
+##  [1] "CODGEO"    "SURF"      "NOM"       "X"         "Y"         "EMPLOI99" 
+##  [7] "ACTOCC99"  "P20ANS99"  "PNDIP99"   "TXCHOM99"  "INTAO99"   "PART99"   
+## [13] "PCAD99"    "PINT99"    "PEMP99"    "POUV99"    "PRET99"    "PMONO99"  
+## [19] "PREFETR99" "RFUCQ201"  "EMPLOI06"  "ACTOCC06"  "P20ANS07"  "PNDIP07"  
+## [25] "TXCHOMA07" "INTAO07"   "PART07"    "PCAD07"    "PINT07"    "PEMP07"   
+## [31] "POUV07"    "PRET07"    "PMONO07"   "PREFETR07" "RFUCQ207"  "REFEROUI" 
+## [37] "DENSEMP"   "SOCLAS"    "POP1936"   "POP1954"   "POP1962"   "POP1968"  
+## [43] "POP1975"   "POP1982"   "POP1990"   "POP1999"   "POP2008"
+```
+
+---
+## Assembler des données
+
+Pour coller de nouvelles lignes à un tableau, on utilise la fonction _bind_rows_ 
+
+1. Importer le tableau idf_soc_eco_pop.csv
+2. Vérifier que les colonnes correspondent avec la table _paris_
+3. Effectuer l'assemblage
+
+---
+## Explorer les variables d'un objet : deux fonctions
+
+- La fonction _summary()_ renseigne sur la distribution d'une variable quantitative (format _numeric_ ou _integer_) :
+
+
+```r
+summary(data$variablequanti)
+```
+
+- La fonction _table()_ renseigne sur la distrbution d'une variable qualitative stockée au format _character_ :
+
+
+```r
+table(data$variablequali)
+```
+
+---
+## La fonction _table_ : calculer des fréquences
+
+On peut stocker le résultat de la fonction _table()_ dans un _data.frame_, où : 
+
+  - une colonne "Var1" stocker les modalités de la variable (variable quali) ; 
+  - une colonne "Freq" stocke la fréquence de chaque modalité (variable quanti) ; 
+  - chaque ligne correspond à une modalité.
+
+Ici, 4 départements différents, donc on obtient un tableau de 4 lignes.
+
+
+```r
+mondf &lt;- as.data.frame(table(data$variablequali))
+```
+
+
+ 
+ 
+---
+class: inverse, center, middle
+
+
+class: center, middle
+
+# Fin
+
+Slides crées avec le package [**xaringan**](https://github.com/yihui/xaringan).
+
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
