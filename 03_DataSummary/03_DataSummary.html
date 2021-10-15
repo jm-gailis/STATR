@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Décrire et résumer l’information statistique</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="R. Leconte" />
+    <script src="libs/header-attrs/header-attrs.js"></script>
+    <link href="libs/remark-css/default.css" rel="stylesheet" />
+    <link href="libs/remark-css/default-fonts.css" rel="stylesheet" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Décrire et résumer l’information statistique
+### R. Leconte
+### Ecole Normale Supérieure
+### 15/10/2021
+
+---
+
+class: inverse, center, middle
+
+
+
+
+
+
+# Résumer l'information statistique
+
+--
+En présence d’un vaste ensemble de données numériques, besoin de simplifier et de représenter l'information :
+
+
+- construire des graphiques (histogramme,  camembert,  etc.)
+- déterminer les valeurs centrales (moyenne, médiane, etc.)
+- évaluer la dispersion (écart-type,variance, intervalle interquartile, etc.) 
+
+Comparer des séries statistiques =&gt; statistique descriptive. 
+
+---
+
+# Représenter les séries statistiques
+
+--
+à partir d'un tableau de dénombrement
+
+- Variable qualitative nominale
+
+
+&lt;img src="img/qalinom.png" width="100%" style="display: block; margin: auto;" /&gt;
+
+---
+
+- Variable qualitative ordinale
+
+
+&lt;img src="img/qualiord.png" width="100%" style="display: block; margin: auto;" /&gt;
+
+
+---
+
+- Variable quantitative
+
+
+
+&lt;img src="img/quanticlass.png" width="100%" style="display: block; margin: auto;" /&gt;
+
+
+---
+à partir d'un caractère ordonné
+
+--
+
+- Fréquences cumulées
+
+
+
+
+&lt;img src="img/freqcu.png" width="100%" style="display: block; margin: auto;" /&gt;
+
+---
+
+- Fonction de probabilité de densité
+
+
+
+&lt;img src="img/density.png" width="100%" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Les valeurs centrales
+
+Les valeurs centrales permettent de résumer par une seule valeur, l’ensemble des valeurs d’une distribution statistique. 
+Elles donnent un *ordre de grandeur* de la distribution.
+Il existe 3 valeurs centrales : 
+- le mode
+- la médiane
+- la moyenne
+
+La comparaison de ces valeurs centrales permet de déterminer la forme de la distribution observée.
+
+---
+
+## Le mode
+
+Le mode, ou valeur dominante, est la valeur la plus fréquente d'une distribution.
+- Se calcule toujours à partir d'un dénombrement des modalités du caractère. 
+- Il faut cependant distinguer le cas des caractères discrets et celui des caractères continus.
+
+--
+
+Pour un caractère qualitatif ou pour un caractère quantitatif discret (ayant un nombre de modalités
+inférieur au nombre d'éléments), le mode est la modalité qui a la fréquence simple la plus élevée (ou l'effectif le plus élevé, ce qui revient au même).
+---
+
+&lt;img src="img/mode.png" width="70%" style="display: block; margin: auto;" /&gt;
+---
+
+Pour un caractère quantitatif continu, les modalités sont en nombre infini
+(il est peu probable que deux éléments aient la même valeur),le mode ne peut pas être défini directement: 
+
+- Il faut établir une partition en classes (tableau de dénombrement) : la classe modale est alors celle dont la fréquence moyenne est la plus élevée.
+
+- C'est la classe où les valeurs sont le plus concentrées mais pas toujours celle qui comporte le plus d'individus.
+
+- Le mode est obtenu en prenant le centre de la classe modale, c'est à dire la moyenne de ses bornes supérieure et inférieure.
+---
+
+
+&lt;img src="img/classe_mod.png" width="100%" style="display: block; margin: auto;" /&gt;
+---
+
+Lorsque l'histogramme d'une distribution présente deux pics séparés par un creux, on
+dit que la distribution est bimodale.
+
+On distingue alors un mode principal et un mode secondaire.
+
+&lt;img src="img/bimod.png" width="100%" style="display: block; margin: auto;" /&gt;
+
+---
+
+## La médiane (caractères quantitatifs)
+
+La médiane est la valeur du caractère qui partage l'ensemble décrit par caractère en deux sous ensembles d'effectifs égaux :
+
+- 50 % des éléments ont des valeurs supérieures à la médiane et 50% prennent des valeurs inférieures.
+
+- Si la distribution a un nombre impair d'éléments on trouve une valeur unique qui est la médiane.
+- Si la distribution a un nombre pair d'éléments, on trouve deux valeurs qui déterminent un intervalle médian. La médiane est alors le centre de cet intervalle médian.
+---
+
+&lt;img src="img/mediane.png" width="70%" style="display: block; margin: auto;" /&gt;
+
+---
+*Propriétés de la médiane.*
+
+La médiane est la valeur du caractère qui est la plus proche de toutes les autres. Elle minimise les distances en valeur absolue. 
+
+Elle est souvent utilisé en géographie pour déterminer des localisations optimales, c'est à dire des emplacements dotés de la meilleure accessibilité possible (minimisation de la distance d'un
+point à tous les autres)
+
+---
+
+## La moyenne
+
+La moyenne simple est égale à la somme des valeurs divisée par le nombre d'éléments.
+C’est le centre de gravité d’une distribution, elle a une signification physique.
+
+La moyenne est sensible aux valeurs extrêmes: si l'on supprime l'individu qui a la valeur maximale ou minimale, elle change fortement. Ce n'est pas le cas de la médiane ou du mode qui sont plus robustes. 
+
+---
+
+## Valeurs centrales et formes des distribution
+
+
+&lt;img src="img/distrib.png" width="80%" style="display: block; margin: auto;" /&gt;
+
+Ex: comparer la forme de la distribution des revenus dans un ensemble de pays. 
+
+---
+
+# Paramètres de dispersion 
+
+On appelle paramètre de dispersion une mesure du degré de proximité ou d’éloignement des valeurs de cette distribution.
+Les paramètres de dispersion complètent le premier résumé apporté par les valeurs centrales.
+
+On distingue la dispersion absolue (mesurée dans l'unité de mesure du caractère) et la dispersion relative (mesurée par un nombre sans dimension).
+---
+
+## Dispersion absolue
+
+---
+### Etendue
+
+On appelle étendue d’une distribution la plus grande distance entre deux valeurs d’une distribution. C’est la différence entre le maximum et le minimum.
+
+- Etendue(X) = Max(X) Min (X)
+
+Ex: comparer l'étendue des salaires dans plusieurs entreprises.
+
+---
+### Quantiles
+
+On appelle quantiles d’une distribution les valeurs qui permettent de découper cette distribution en n classes d’effectifs égaux .
+Si découpage en 4 classes on appelle quartiles d’une distribution les trois valeurs Q1,
+Q2 et Q3 qui permettent de découper cette distribution en quatre classes d’effectifs égaux.
+
+Min (25%) Q1 (25%) Q2 (25%) Q3 (25%) Max
+
+- 4 classes = quartiles
+- 5 classes = quintiles
+- 10 classes = déciles
+- 100 classes = centiles
+
+---
+
+### Intervalles inter-quantiles
+
+On appelle intervalle Inter Quantile l’étendue de la distribution qui regroupe un certain pourcentage des valeurs au centre de la distribution, une fois éliminé les valeurs les plus faibles et les valeurs les plus fortes de la distributions.
+
+- Si découpage en 4 classes, intervalle interquartile (Q3 Q1) l’étendue de la distribution qui regroupe 50% des valeurs une fois qu’on a élimine les 25% des valeurs les plus faibles et les plus fortes.
+
+Int. Interquartile (X) = Q3(X) - Q1(X)
+
+- Si découpage en 10 classes, intervalle interdécile (D9 D1) l’étendue de la distribution qui regroupe 80% des valeurs au centre de la distribution une fois qu’on a éliminé les 10% des valeurs les plus faibles et 10% des valeurs les plus fortes.
+
+Int. Interdécile (X) = D9(X) - D1(X)
+
+
+---
+### Dispersion autour de la moyenne
+
+L’écart absolu moyen est la moyenne des distances à la moyenne.
+
+L’écart type est la racine carrée de la variance.
+La variance est la moyenne des carrés des écarts à la moyenne.
+
+L’écart type est intéressant lorsque les distributions sont « Gauss normales » (unimodales et symétriques).
+
+Dans ce cas on peut définir des probabilités de dispersion autour de la moyenne : 
+
+- 68% des valeurs se situe entre 1 et +1 écart type
+- 95% des valeurs à moins de 2 et +2 écart type
+- 99.7% des valeurs à moins de 3 et +3 écart type
+
+---
+## Dispersion relative
+
+La comparaison des paramètres de dispersion absolue de deux caractères n'a de sens que si les 
+deux caractères sont de même nature et de même ordre de grandeur.
+
+Dans le cas contraire, la comparaison n'est possible qu'en ayant recours à des mesures de dispersion relative. 
+
+On le calcule en divisant le paramètre de dispersion absolue par la valeur centrale qui lui sert de référence.
+
+On obtient un nombre sans unité de mesure qui peut être exprimé en %.
+
+--
+
+Coefficient de variation (C.V.): Ecart type / moyenne
+
+Ecart moyen relatif: écart absolu moyen / moyenne
+
+Coefficient interquartile relatif: intervalle interquartile absolu / médiane
+
+---
+# *Interprétation géographique*
+
+
+&lt;img src="img/dispersion_spatiale.png" width="100%" style="display: block; margin: auto;" /&gt;
+
+
+---
+# Avec R. 
+
+- Manipuler avec les verbes _dplyr_
+- Visualiser avec le package _ggplot2_
+- Résumer les variables avec _summary()_ et _table()_ 
+
+---
+
+# Représenter une distribution
+
+
+```r
+mydata &lt;- read.csv("C:/Users/romai/Documents/ens_ulm/cours/STATR/statsmappingwithR-master/statsmappingwithR-master/03_DataSummary/data/idf_pse.csv")
+
+
+library(ggplot2)
+```
+
+---
+
+
+```r
+# Courbe de densité
+ggplot(mydata, aes(x=POP2008)) + 
+  geom_density()+
+
+# Ajouter la ligne de la moyenne
+  geom_vline(aes(xintercept=mean(POP2008)),
+            color="blue", linetype="dashed", size=1)+
+  #médiane
+    geom_vline(aes(xintercept=median(POP2008)),
+            color="red", linetype="dashed", size=1)+
+  
+  # Habiller le graphique
+      ylab("Densité de probabilité")+
+  xlab("Population communale en 2008")+
+  ggtitle("Distribution de la population communale en Ile de France")
+```
+
+&lt;img src="03_DataSummary_files/figure-html/unnamed-chunk-13-1.png" width="40%" /&gt;
+
+---
+# Histogramme
+
+
+```r
+ggplot(mydata, aes(x = POP2008))+
+  geom_histogram(binwidth = 10000)
+```
+
+&lt;img src="03_DataSummary_files/figure-html/unnamed-chunk-14-1.png" width="40%" /&gt;
+
+---
+# Fréquences cumulées
+
+
+```r
+ggplot(mydata, aes(x= POP2008)) +
+    geom_line(stat="ecdf")+
+    ylab("Fréquences cumulées (%)")+
+  xlab("Population communale en 2008")+
+  ggtitle("Distribution de la population communale en Ile de France")
+```
+
+&lt;img src="03_DataSummary_files/figure-html/unnamed-chunk-15-1.png" width="40%" /&gt;
+
+---
+# Diagramme en barres
+
+
+```r
+mydata &lt;- mydata %&gt;% 
+  mutate(DEPT = substr(CODGEO, 1,2))
+
+ggplot(mydata, aes(x = DEPT))+
+  geom_bar()+
+  ylab("Nombre de communes")+
+  xlab("Départements")
+```
+
+&lt;img src="03_DataSummary_files/figure-html/unnamed-chunk-16-1.png" width="40%" /&gt;
+
+
+
+---
+# La boîte à moustaches
+
+_ggplot_ met en évidences les valeurs supérieures à Q3 + 1,5 fois l'intervalle interquartile
+et inférieures à Q1 + 1,5 fois l'intervalle interquartile (outliers)
+
+
+```r
+ggplot(mydata, aes(x = POP2008, y = DEPT))+
+  geom_boxplot()
+```
+
+&lt;img src="03_DataSummary_files/figure-html/unnamed-chunk-17-1.png" width="40%" /&gt;
+
+
+---
+
+# Comparer la distribution de variables
+
+
+- La fonction _summary()_ renseigne sur la distribution d'une variable quantitative (format _numeric_ ou _integer_) :
+
+
+```r
+summary(mydata$POP2008)
+```
+
+- Les fonctions _mean_, _median_, _quantile_
+
+
+```r
+quantile(mydata$POP2008, probs = c( 0.1, 0.9))
+```
+
+```
+##     10%     90% 
+##  9999.0 89505.6
+```
+
+```r
+median(mydata$POP2008)
+```
+
+```
+## [1] 31854
+```
+
+---
+
+- La fonction _table()_ renseigne sur la distrbution d'une variable discrète :
+
+
+```r
+table(mydata$DEPT)
+
+table(mydata$TXCHOMA07)
+```
+
+---
+## La fonction _table_ : calculer des fréquences et le mode
+
+On peut stocker le résultat de la fonction _table()_ dans un _data.frame_, où : 
+
+  - une colonne "Var1" stocker les modalités de la variable (variable quali) ; 
+  - une colonne "Freq" stocke la fréquence de chaque modalité (variable quanti) ; 
+  - chaque ligne correspond à une modalité.
+
+Ici, 4 départements différents, donc on obtient un tableau de 4 lignes.
+
+
+```r
+eff_departements &lt;- as.data.frame(table(mydata$DEPT))
+```
+
+
+
+---
+# Paramètres de dispersion
+
+
+```r
+# Etendue
+max(mydata$POP2008) - min(mydata$POP2008)
+```
+
+```
+## [1] 232411
+```
+
+```r
+# Ecart interquartiles
+IQR(mydata$POP2008)
+```
+
+```
+## [1] 36064
+```
+
+```r
+#ou 
+quantile(mydata$POP2008, 0.75) - quantile(mydata$POP2008, 0.25)
+```
+
+```
+##   75% 
+## 36064
+```
+
+```r
+# Ecart absolu moyen
+mean(abs(mydata$POP2008 - mean(mydata$POP2008)))
+```
+
+```
+## [1] 29937.63
+```
+
+```r
+# Coefficient de variation
+sd(mydata$POP2008)/mean(mydata$POP2008)*100
+```
+
+```
+## [1] 94.19268
+```
+---
+# Exercice. Homogénéité et hétérogénéité spatiale
+
+1. Comparer et interpréter les distributions statistiques de la population communale en 1936, 1968, 1990 et 2008.
+
+2. Comparer et interpréter les distributions du revenu fiscal médian communal dans les 4 départements franciliens. 
+
+
+
+---
+
+
+
+class: center, middle
+
+# Merci !
+
+Slides crées avec le package [**xaringan**](https://github.com/yihui/xaringan).
+
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
