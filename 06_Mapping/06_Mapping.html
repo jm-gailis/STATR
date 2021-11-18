@@ -1,0 +1,909 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Cartographier des données</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="R. Leconte" />
+    <script src="libs/header-attrs-2.11/header-attrs.js"></script>
+    <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
+    <link href="libs/remark-css-0.0.1/default-fonts.css" rel="stylesheet" />
+    <link href="libs/remark-css-0.0.1/hygge.css" rel="stylesheet" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Cartographier des données
+## Statistique et cartographie avec R
+### R. Leconte
+### Ecole Normale Supérieure
+### 19/11/2021
+
+---
+
+class: inverse, center, middle
+# Rappel
+
+
+
+
+&lt;style&gt;
+.html-widget {
+    margin: auto;
+}
+&lt;/style&gt;
+
+&lt;style type="text/css"&gt;
+/* custom.css */
+.left-code {
+  color: #777;
+  width: 38%;
+  height: 92%;
+  float: left;
+}
+.right-plot {
+  width: 60%;
+  float: right;
+  padding-left: 1%;
+}
+.plot-callout {
+  height: 225px;
+  width: 450px;
+  bottom: 5%;
+  right: 5%;
+  position: absolute;
+  padding: 0px;
+  z-index: 100;
+}
+.plot-callout img {
+  width: 100%;
+  border: 4px solid #23373B;
+}
+&lt;/style&gt;
+
+---
+# Rappel
+
+- Pour ouvrir des données spatiales sous R, on utilise le package sf ;
+
+- Le format *sf* stocke les formes géométriques et les données attributaires associées dans un même objet. Les variables et individus sont donc stockées dans un *data.frame*.
+
+- Pour manipuler cet objet, on peut utiliser les verbes de *dplyr* (select, filter, mutate, group_by, *etc*);
+
+- Ou les fonctions de géotraitement de _sf_ pour modifier/créer la donnée. 
+
+- Les outils de visualisation pour explorer les données: plot, ggplot, mapview...
+
+- Avant de basculer vers la cartographie de ces données avec des packages dédiés.
+
+---
+## Cartographier avec R, mais surtout cartographier...
+
+- La composante technique est importante, mais pas essentielle. 
+
+- Visualiser des données spatiales pour explorer un jeu de données ≠ Cartographier. 
+&lt;!-- l'essentiel : la cartographie est une démarche scientifique qui repose sur des normes et méthodes précises.
+Visualiser de manière brute des données spatiales relève seulement d'une démarche exploratoire pour se familiariser avec la structure et le contenu d'un jeu de données (repérer les types de variables, les éventuelles valeurs manquantes, identifier des possibilités de traitement, des opérations de recodage à effectuer). --&gt;
+
+- Cartographie : normes de sémiologie graphique ; discours scientifique. 
+
+- Sur la cartographie, deux références : 
+
+  - [Manuel de cartographie](https://www.armand-colin.com/manuel-de-cartographie-principes-methodes-applications-9782200612856) ;
+  - Béguin &amp; Pumain, 2003, *La représentation des données cartographiques. Statistiques et cartograhie*, Belin. Chapitres 3 et 5. 
+
+
+- Pour cartographier avec R, des ressources en ligne :
+
+  - [Cartographie avec R](https://github.com/riatelab/mapsf) avec le package *mapsf* ; 
+  - le blog [RGeomatic](https://rgeomatic.hypotheses.org/), du même package, très complet ; 
+  - [Chapter 8 Making maps with R](https://geocompr.robinlovelace.net/adv-map.html), en anglais, avec le package *tmap.*  
+  - le package *ggplot2*, de la suite *tidyverse* est le plus populaire pour la visualisation de données. il permet de cartographier des objets SF. Voir par exemple ce [manuel en ligne](https://cengel.github.io/R-spatial/mapping.html).
+  
+
+
+---
+class: inverse, center, middle
+
+# La sémiologie graphique
+
+---
+## Sémiologie graphique
+
+La cartographie utilise un langage cartographique. 
+
+Celui-ci utilise des **variables visuelles** que l'on applique aux formes géométriques (points, lignes, polygones).
+
+Jacques Bertin propose 6 variables (*La sémiologie graphique*, 1967) : la taille, la valeur (ou la teinte) , la couleur, la forme, l'orientation et le grain. &lt;!-- Comme le rappellent Lambert et Zanin, c'était à l'époque du Noir et Blanc.  --&gt;
+
+&lt;!-- De manière pragmatique, 3 variables visuelles sont à retenir : couleur, taille et forme.  --&gt;
+
+L'utilisation de ces variables visuelles, soit la sémiologie graphique, varie selon la nature des données et le type de variables.
+
+
+---
+## Sémiologie graphique : 3 variables
+
+&lt;img src="img/VariablesVisuelles.PNG" width="100%" style="display: block; margin: auto;" /&gt;
+.center[Source : Hadrien Commenges, 2018, "Sémiologie graphique et travail de l’image", Université Paris I]
+
+---
+
+Dans R, les fonctions des *packages* comportent des arguments pour choisir, tester et modifier ces variables visuelles, de manière quasi-automatique.
+
+En amont, la réflexion scientifique et méthodologique est nécessaire et primordiale. Des connaissances en statistiques descriptives sont donc requises, notamment sur l'enjeu et les méthodes de discrétisation. 
+
+
+
+---
+class: inverse, center, middle
+# Cartographier : produire un message. 
+
+---
+### Cartographier : produire un message. 
+
+
+&lt;img src="img/Lambert.jpg" width="70%" height="70%" style="display: block; margin: auto;" /&gt;
+
+
+
+---
+## Cartographier : produire un message. 
+
+Des références sur la cartographie : 
+
+- [How Charts Lie: Getting Smarter About Visual Information](http://www.thefunctionalart.com/p/reviews.html), d'Alberto Cairo (University of Miami) ; 
+- [Le Carnet (neo)cartographique](https://neocarto.hypotheses.org/), animé par Nicolas Lambert (UMS RIATE).
+
+
+
+---
+class: inverse, center, middle
+
+# La couleur
+
+---
+
+### Les couleurs dans R
+
+Une couleur peut s'appeler par son nom (en général en anglais, ex : "*blue*") ou par son code HEX ("#0000FF")
+
+L'argument utilisé est *col*, pour *color*. On peut désigner les couleurs souhaitées, en les nommant par une chaine de charactères (un nom ou un [HEX code](https://htmlcolorcodes.com/fr/)).
+
+
+.pull-left[
+
+
+```r
+plot(st_geometry(idf_sf))
+```
+
+![](04_Mapping_files/figure-html/unnamed-chunk-4-1.png)&lt;!-- --&gt;
+
+
+]
+
+.pull-right[
+
+```r
+plot(st_geometry(idf_sf),
+col = "khaki4")  #argument
+```
+
+![](04_Mapping_files/figure-html/unnamed-chunk-5-1.png)&lt;!-- --&gt;
+]
+
+---
+### Les couleurs dans R
+
+R contient [657](http://www.stat.columbia.edu/~tzheng/files/Rcolor.pdf) couleurs. 
+
+&lt;img src="04_Mapping_files/figure-html/unnamed-chunk-6-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+### Les packages de couleur
+
+Manipuler des couleurs sous R, c'est manipuler des vecteurs !
+
+```r
+col = "blue"
+col = c("blue", "red") # deux couleurs
+col = c("0000FF") #Hex code
+```
+
+De **très nombreux packages** permettent de choisir des palettes de couleurs : 
+- les *packages* de cartographie et *data viz* ont quelques palettes en stock : 
+- d'autres *packages* sont spécifiquement développés pour la couleur ; 
+
+Le principe reste le même : nommer la palette désirée avec un argument ; préciser le nombre de couleurs souhaité dans un autre argument (souvent *n = X*). 
+
+---
+### Les packages de couleur
+
+Pour la cartographie : 
+
+- le package [RColorBrewer](https://colorbrewer2.org/#type=sequential&amp;scheme=BuGn&amp;n=3) propose des palettes de type continue (gradient de couleur), divergente (gradient divergent, de type chaud-froid) ou qualitative (une couleur par modalité de la variable).
+
+
+```r
+library(RColorBrewer)
+
+display.brewer.all() #affiche toutes les palettes
+```
+
+&lt;img src="04_Mapping_files/figure-html/unnamed-chunk-8-1.png" height="10%" style="display: block; margin: auto;" /&gt;
+
+```r
+# display.brewer.pal(n = 8, name = 'Dark2') 
+# display.brewer.pal(n = 8, name = 'Oranges')
+# display.brewer.pal(n = 8, name = 'Spectral')
+```
+
+---
+### Les packages de couleur 
+
+
+- le package *rcartocolor* proposé par l'entreprise [CARTO](https://carto.com/carto-colors/) : 
+
+
+```r
+library(rcartocolor)
+display_carto_all()
+```
+
+&lt;img src="04_Mapping_files/figure-html/unnamed-chunk-9-1.png" style="display: block; margin: auto;" /&gt;
+
+
+---
+### Les packages de couleur 
+
+- le package [viridis](https://cran.r-project.org/web/packages/viridis/vignettes/intro-to-viridis.html), utilisé par défaut par le package *mapview.*
+- échelles de couleurs adaptées aux différents types de daltonisme et compatibles avec l'impression en noir et blanc
+
+&lt;img src="04_Mapping_files/figure-html/unnamed-chunk-10-1.png" style="display: block; margin: auto;" /&gt;
+---
+- le *package* [wesanderson](https://www.datanovia.com/en/blog/top-r-color-palettes-to-know-for-great-data-visualization) propose des palettes d'après les films du réalisateur Wes Anderson. 
+
+
+
+.pull-left[
+
+```r
+wes_palette("Darjeeling1")
+```
+
+&lt;img src="04_Mapping_files/figure-html/unnamed-chunk-12-1.png" width="30%" style="display: block; margin: auto;" /&gt;
+]
+
+.pull-right[
+
+```r
+wes_palette("GrandBudapest2")
+```
+
+&lt;img src="04_Mapping_files/figure-html/unnamed-chunk-13-1.png" width="30%" style="display: block; margin: auto;" /&gt;
+]
+
+
+---
+### Les couleurs dans R
+
+
+**Bilan technique** - Appeler une palette de couleur consiste à appeler un *vecteur* composé de chaines de caractères, qui renvoient à des codes couleurs.  
+
+
+```r
+col = viridis(2) #vecteur de taille 2
+```
+
+
+```r
+viridis(2) # éléments du vecteur
+```
+
+```
+## [1] "#440154FF" "#FDE725FF"
+```
+Cette [page internet](https://github.com/EmilHvitfeldt/r-color-palettes) recense toutes les palettes et packages développés pour la couleur. 
+
+**Bilan scientifique** - le choix des couleurs est dicté par : 
+
+- le type de variable (quanti / quali) ; 
+- le message de la carte (couleur = charge symolique, connotation culturelle) ; 
+- les qualités esthétiques (une carte doit être agréable à regarder ; distinction fond de carte / données à cartographier) ; 
+- le public visé et les contraintes d'édition.
+
+
+---
+## Sémiologie : un choix esthétique et scientifique. 
+
+Selon que la variable soit **quantitative** (stock / ratio) ou **qualitative** (nominal / ordinal), différentes normes s'imposent. 
+
+Dans R, l'exploration des données a donc pour enjeu d'identifier le type de variables.
+
+*Rappel : glimpse(), summary(), table(), plot(), mapview()*.
+
+
+
+---
+## Composition et habillage
+
+Une carte comporte **obligatoirement** : 
+
+- un titre clair et court, intégré au graphique ; 
+- une légende hiérarchisée et équilibrée d'un point de vue graphique ; 
+- une échelle ;
+- des sources : nom de l'auteur et origine des données (institution, date).
+
+Sous R, l'ensemble de ces éléments est paramétré par les *arguments* de chaque *fonction.*
+
+
+---
+class: inverse, center, middle
+
+# Le package *mapsf*
+
+Successeur du package _cartography_:
+- développé à partir de _sf_;
+- compatible avec l'écriture en _%&gt;%_ 
+
+
+---
+## La carte typologique : production, habillage et sauvegarde
+
+Elle permet de représenter une variable qualitative. 
+
+
+
+```r
+library(mapsf)
+
+# Fond de carte (aucune variable)
+mf_map(x = objet_sf, col = "orange", 
+       border = "white")
+
+# Variable représentée
+
+mf_map(x = objet_sf, type = "type", var = "VARIABLE",
+       leg_title = "TITRE = NOM DE LA VARIABLE", add = TRUE)
+
+# Habillage de la carte
+mf_layout(title = "Titre", 
+          credits = "Sources: Données, 2021",
+          scale = TRUE,
+          arrow = TRUE,
+          frame = FALSE)
+```
+
+
+---
+### Fonction de base
+
+
+.left-code[
+
+```r
+mf_map(idf_sf, type = "typo",
+  var = "NOM_DEPT") 
+```
+]
+
+.right-plot[
+![](04_Mapping_files/figure-html/plot-label0-out-1.png)&lt;!-- --&gt;
+]
+
+---
+### Choix d'une palette de couleur
+
+.left-code[
+
+```r
+mf_map(idf_sf, type = "typo",
+  var = "NOM_DEPT",
+  pal = viridis(4)) 
+```
+]
+
+.right-plot[
+![](04_Mapping_files/figure-html/plot-labelA-out-1.png)&lt;!-- --&gt;
+]
+
+
+
+
+---
+### Légende
+
+.left-code[
+
+```r
+mf_map(x = idf_sf, 
+       type = "typo", 
+       var = "NOM_DEPT",
+       leg_title = "Départements",  
+       leg_pos = "topleft")
+```
+]
+
+.right-plot[
+![](04_Mapping_files/figure-html/plot-label-out-1.png)&lt;!-- --&gt;
+]
+
+
+---
+### Habillage
+
+.left-code[
+
+```r
+mf_map(x = idf_sf, 
+       type = "typo", 
+       var = "NOM_DEPT",
+       leg_title = "Départements",  
+       leg_pos = "topleft")
+
+mf_layout(title = "La métropole parisienne", 
+          credits = "Auteur: R. Leconte, 2021. Données: INSEE, 2007",
+          scale = TRUE,
+          arrow = FALSE)
+```
+]
+
+.right-plot[
+![](04_Mapping_files/figure-html/plot-label1-out-1.png)&lt;!-- --&gt;
+]
+
+---
+### Export et sauvegarde
+
+On peut exporter les graphiques au format PDF, JPG, PNG...
+
+- Soit on clique sur "Export" et on sauvegarde  à la main..
+
+--
+
+- Soit on code avec les fonctions pdf() ou png(). Intérêt : reproductible. Voir des explications [ici](https://www.datamentor.io/r-programming/saving-plot/) ou [là](http://larmarange.github.io/analyse-R/export-de-graphiques.html).
+
+---
+### Export et sauvegarde
+
+
+
+```r
+# 1. D'abord, on place en haut la fonction pour sauvegarder
+
+pdf("img/Carte.pdf", # Emplacement et nom du fichier
+width=7, #largeur en pouces - une page A4 fait environ 8 x 11
+height=7 , #hauteur en pouces
+useDingbats=FALSE)
+
+# Ou bien 
+png("img/Carte.png", # Emplacement et nom du fichier
+    width=7, #largeur en pouces 
+    height=7 , #hauteur en pouces
+    res = 300) # résolution en pixels par pouce (DPI) - 300 est idéal pour imprimer
+
+#2. Puis on place TOUTES les lignes de code pour produire la carte
+
+mf_map(...names())
+
+#3. On conclut avec la fonction  qui 
+# "clotûre" les fonctions pdf() ou png()
+
+
+
+# On exécute le tout ! 
+```
+On récupère un fichier *.pdf* ou *.png* dans le dossier défini.
+
+---
+### Export et sauvegarde
+
+Chaque fois que l'on veut changer un titre, un palette de couleurs, une variable *etc*, il suffit de modifier la ligne de code correspondante, et de tout exécuter. 
+
+Le fichier précédent est automatiquement remplacé par cette nouvelle version. 
+
+On peut ainsi produire, à la chaîne, autant de cartes que nécessaire, en faisant du copier-coller, voire en écrivant des boucles (niveau plus avancé).
+
+
+---
+# La carte de symboles proportionnels
+
+
+
+```r
+mf_map(idf_sf, col = "grey90", border = "grey50")
+
+mf_map(idf_sf, 
+       var = "POPULATION",
+       type = "prop",
+       leg_title= "Population en miliers",
+       leg_pos = "topleft",
+       inches = 0.1,
+       symbol = "circle",
+       col = "darkblue",
+       add = TRUE)
+
+mf_layout(title = "Population en Ile de France", 
+    credits = "Auteur: R. Leconte, 2021. Données : INSEE, 2007",
+    frame = TRUE,
+    arrow = FALSE,
+    scale = TRUE)
+
+mf_arrow(pos = "topright")
+```
+
+---
+# La carte de symboles proportionnels
+
+&lt;img src="04_Mapping_files/figure-html/unnamed-chunk-19-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+# La carte typologique : figuré ponctuel
+
+
+
+
+---
+## La carte typologique : figuré ponctuel
+
+
+```r
+mf_map(idf_sf)
+
+mf_map(stations, 
+       type = "symb", 
+       var = "station", 
+       pch = 22, # forme du symbole
+       cex = 0.5, # taille du symbole
+       pal = "darkgreen", 
+       border = NA,
+       add = TRUE)
+
+mf_layout(title = "Les stations de transport en commun", 
+          credits = "Données: Ile de France Mobilités, 2021", 
+          scale = TRUE,
+          arrow = FALSE)
+```
+
+---
+## La carte typologique : figuré ponctuel
+
+
+---
+
+# La discrétisation
+
+---
+## Variable quantitative : la discrétisation
+
+&lt;blockquote&gt;
+"Perdre le moins possible d’information, du point de vue de la statistique, reviendrait à cartographier toutes les valeurs (…). Or, nous savons que les règles de la perception visuelle contredisent cette exigence, la lisibilité (…) étant d’autant plus grande que le nombre de signes distincts, donc de classes, est petit."
+.right[-- &lt;cite&gt;Béguin et Pumain, 1994&lt;/cite&gt;]
+&lt;/blockquote&gt;
+
+Il faut donc rendre *les caractères continus discrets* : on parle de discrétisation.
+
+On passe d'une *variable quantitative continue* à une *variable qualitative ordonnée*.
+
+C'est une démarche statistique et visuelle.
+
+---
+## Discrétiser : découper une série en classes. 
+
+- Discrétiser revient à opter pour un compromis.
+
+  - Résumer au mieux la distribution (conserver l’hétérogénéité des unités) = *le plus grand nombre de classes*.
+  - Construire une carte efficace (synthétiser) = *un faible nombre de classes*.
+  - Choisir des combinaisons de variables visuelles pour restituer les spécificités de la distribution statistique = *sémiologie graphique*.
+
+- Réduire l'information pour cartographier entraine donc des enjeux :
+
+  - Conserver l’ordre de grandeur ;
+  - Conserver la forme de la distribution ;
+  - Conserver la dispersion ;
+  - Décider de conserver ou non les singularités (que faire des unités spatiales aux valeurs extrêmes ?).
+  
+---
+## Les méthodes de discrétisation 
+
+- Il faut d'abord étudier la distribution de la variable : 
+      - avec un histogramme ; 
+      - avec un [boxplot](https://juba.github.io/tidyverse/08-ggplot2.html#geom_boxplot) ;
+      - avec une [courbe de distribution](https://juba.github.io/tidyverse/08-ggplot2.html#geom_density)
+
+- Le choix d'une méthode de discrétisation est déterminée par la distribution de la variable. 
+
+- Des références : 
+
+  - Lambert et Zanin, 2019, [Manuel de cartographie](https://www.armand-colin.com/manuel-de-cartographie-principes-methodes-applications-9782200612856), Armand Colin ;
+  
+  - "Chapitre 5 : Découper en classes les séries quantitatives", Béguin &amp; Pumain, 2003, *La représentation des données cartographiques. Statistiques et cartographie*, Belin. 
+
+---
+# La discrétisation sur R
+
+- Discrétiser  : découper un vecteur de valeurs numériques...
+- ... pour obtenir un plus petit vecteur...
+- ... que l'on va associer à une palette de couleurs (et son vecteur !).
+
+
+- le package _mpasf_ comporte des fonctions pour cartographier une variable quantitative en la discrétisant. 
+
+---
+## Carte choroplèthe
+
+
+.left-code[
+
+```r
+mf_map(idf_sf, type = "choro",
+var = "TXCHOMA07")
+```
+]
+
+.right-plot[
+![](04_Mapping_files/figure-html/plot-labelX-out-1.png)&lt;!-- --&gt;
+]
+
+
+---
+## Carte choroplèthe
+
+- la fonction *mf_get_breaks()* renvoie le vecteur produit par la méthode de discrétisation mentionnée.
+
+
+```r
+bks &lt;- mf_get_breaks(idf_sf$TXCHOMA07,
+                 breaks= "quantile",
+                 nbreaks = 4)
+bks
+```
+
+```
+## [1]  6  8 10 14 23
+```
+
+- Au sein de la fonction *mf_map()*, on paramètre les arguments suivants : 
+
+  - *breaks* : "quantile", "jenk", "sd", "q6", "geom" etc.
+  - *nbreaks* : nombre de classes attendues.
+  - *pal* : un vecteur de couleurs. 
+  
+---
+
+### Seuils naturels
+
+Les bornes sont crées par observation de la distribution : repérer, à l'oeil, des ruptures ou des seuils naturels.
+
+On ne peut pas utiliser une telle méthode pour comparer des variables. 
+
+.left-code[
+
+
+```r
+bks &lt;- c(6, 10, 15, 30)
+
+mf_map(idf_sf)
+mf_map(idf_sf, 
+       var = "TXCHOMA07", 
+       type = "choro",
+       breaks = c(6, 10, 15, 30),
+       pal = viridis(3),
+       leg_title = "Taux de chômage\n(seuils observés)",
+       add = T)
+
+mf_layout(title = "Le chômage en IDF", 
+    credits = "Auteur: R. Leconte, 2021. Données: INSEE, 2007",
+    arrow = FALSE)
+```
+
+]
+
+.right-plot[
+&lt;img src="04_Mapping_files/figure-html/plot-labelZ-out-1.png" style="display: block; margin: auto;" /&gt;
+]
+---
+### Amplitude égale
+
+Les classes possèdent la même amplitude. Méthode qui permet de comparer plusieurs variables. 
+
+.left-code[
+
+```r
+mf_map(idf_sf)
+mf_map(idf_sf, 
+       var = "TXCHOMA07", 
+       type = "choro",
+       breaks = c(5,10,15,20, 25),
+       pal = viridis(4),
+       leg_title = "Taux de chômage",
+       add = T)
+
+mf_layout(title = "Le chômage en IDF", 
+    credits = "Auteur: R. Leconte, 2021. Données: INSEE, 2007",
+    arrow = FALSE)
+```
+]
+
+.right-plot[
+&lt;img src="04_Mapping_files/figure-html/plot-label2-out-1.png" style="display: block; margin: auto;" /&gt;
+]
+---
+### Effectifs égaux (quartiles)
+
+La méthode des effectifs égaux est appropriée lorsque la distribution est asymétrique. Elle permet de comparer plusieurs variables. 
+
+Ici, les bornes sont construites en 4 classes d’effectifs égaux : des quartiles. 
+
+&lt;img src="04_Mapping_files/figure-html/unnamed-chunk-24-1.png" style="display: block; margin: auto;" /&gt;
+
+### Effectifs égaux (déciles)
+
+Les bornes sont ici construites en 10 classes d’effectifs égaux.
+
+&lt;img src="04_Mapping_files/figure-html/unnamed-chunk-25-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+### Moyenne et écart-type
+
+Les classes sont déterminées selon une fraction d’écart-type par rapport à la moyenne. Cette méthode est valide lorsque la distribution est symétrique. On peut éventuellement comparer d'autres variables *si ces dernières ont aussi une distribution symétrique*. 
+
+&lt;img src="04_Mapping_files/figure-html/unnamed-chunk-26-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+### Jenks
+
+Maximise la variance inter-classe et minimise la variance intra-classe. 
+
+Utile et rapide pour dégager des groupes cohérents, mais ne permet pas la comparaison. 
+
+&lt;img src="04_Mapping_files/figure-html/unnamed-chunk-27-1.png" style="display: block; margin: auto;" /&gt;
+
+
+---
+## Conclusion 
+
+- La discrétisation détermine l'apparence et le message de la carte ; 
+
+- Toute carte doit préciser en légende la méthode de discrétisation retenue ; 
+
+- La discrétisation doit permettre de renseigner sur la position d'une unité spatiale par rapport à la distribution de la variable. 
+
+- Une bonne pratique consiste à associer à la carte un histogramme.
+
+
+
+
+
+---
+
+class: center, middle
+
+# Fin
+
+Slides crées avec le package [**xaringan**](https://github.com/yihui/xaringan).
+
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
