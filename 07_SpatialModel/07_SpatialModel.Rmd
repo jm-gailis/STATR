@@ -1,0 +1,105 @@
+---
+title: "Construire un modèle spatial: le vote FN en Ile-de-France (hors Paris)"
+author: "R. Leconte"
+date: "25/11/2021"
+output: html_document
+---
+
+
+
+
+# 1. Préparer son environnement de travail 
+
+- Charger les packages nécessaires
+- Définir son working directory
+
+```{r environnement}
+library(dplyr)
+library (ggplot2)
+library(sf)
+library(mapsf)
+
+
+```
+
+
+
+
+# 2. Préparer les données
+
+- Charger les jeux de données
+- Sélectionner les individus analysés
+- Joindre les différents tableaux
+
+```{r data}
+
+
+```
+
+
+
+# 3. Analyser la distribution statistique et spatiale de la variable analysée
+
+- Etudier la distribution statistique: ordres de grandeur, dispersion, forme, individus extrêmes 
+
+```{r dstat}
+
+```
+
+
+- Etudier le distribution spatiale par la cartographie: repérer les formes spatiales
+
+```{r dspa}
+
+```
+
+
+- Formuler une hypothèse spatiale: 
+
+«Aujourd’hui, le vote Front national émerge précisément sur ces territoires de la France périphérique, avec des bastions qui sont toujours le Nord, l’Est, le pourtour méditerranéen, mais on voit bien, quand on zoome sur des régions et des départements, que la logique est exactement la même à chaque fois: c’est-à-dire que la dynamique FN part des petites villes, des zones rurales, des villes moyennes, et en tout cas à chaque fois des zones économiques les moins actives, qui créent le moins d’emplois. **Ce sont les territoires qui sont les plus éloignés des grandes métropoles, des grandes villes actives.**»
+
+Christophe Guilluy: «Le vote FN est devenu un vote de classe». Slate, 26 mars 2015. https://www.slate.fr/story/99531/christophe-guilluy-france-peripherique-vote-fn-departementales
+
+Le vote communal pour le FN augmente proportionnellement à la distance à Paris. 
+
+
+# 4. Construire la variable spatiale explicative: la distance à Paris
+
+- Obtenir les centroïdes des communes 
+- Calculer la distance au centroïde de Paris
+
+
+```{r dist}
+
+
+
+```
+
+
+
+# 5. Construire et valider le modèle
+
+- Calculer la droite de régression
+- Calculer le coefficient de détermination
+- Analyser la distribution des résidus
+
+```{r model}
+
+
+
+```
+
+
+# 6. Analyser les résidus
+
+- Cartographier les résidus
+
+```{r residus}
+
+
+
+```
+
+- Discuter l'hypothèse de départ
+
+
