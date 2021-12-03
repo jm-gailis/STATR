@@ -1,0 +1,286 @@
+---
+title: "Construire un modèle spatial: le vote FN en Ile-de-France (hors Paris)"
+author: "R. Leconte"
+date: "25/11/2021"
+output: html_document
+---
+
+
+
+
+# 1. Préparer son environnement de travail 
+
+- Charger les packages nécessaires
+- Définir son working directory
+
+```{r environnement}
+library(dplyr)
+library (ggplot2)
+library(sf)
+library(mapsf)
+library(viridis)
+
+setwd("C:/Users/romai/Documents/ens_ulm/cours/STATR/07_SpatialModel/")
+
+```
+
+
+
+
+# 2. Préparer les données
+
+- Charger les jeux de données
+- Sélectionner les individus analysés
+- Joindre les différents tableaux
+
+```{r data}
+# Charger le tableau de données des résultats de Le Pen au 1er tour de la présidentielle 2017, à l'échellon communal, France entière
+vote <- read.csv("data/LePen_pres_2017_1T.csv", sep = ",")
+
+# Sélectionner seulement l'IDF
+vote <- vote %>% 
+  filter(dep %in% c( "77", "78", "91", "92", "93", "94", "95"))
+
+# Charger la géometrie
+idf <- st_read("data/communesIDF/communes-dile-de-france-au-01-janvier.shp")
+
+# Interroger le référentiel
+st_crs(idf)
+
+# Reprojetter en Lambert93
+idf <- st_transform(idf, crs= 2154)
+
+
+# Jointure
+
+vote_idf <- left_join(idf, vote, by = c("insee" = "code_INSEE"))
+
+
+```
+
+
+
+# 3. Analyser la distribution statistique et spatiale de la variable analysée
+
+- Etudier la distribution statistique: ordres de grandeur, dispersion, forme, individus extrêmes 
+
+```{r dstat}
+
+# Valeurs centrales
+
+# En l'absence de valeurs pour les arrondissements parisiens, le paramètre na.rm = TRUE permet d'ignorer les cases vides dans le calcul
+
+mean(vote_idf$voix, na.rm = TRUE)
+median(vote_idf$voix, na.rm = TRUE)
+
+# Dispersion
+
+# étendue
+max(vote_idf$voix, na.rm = TRUE) - min(vote_idf$voix, na.rm = TRUE)
+
+# écart interdéciles
+quantile(vote_idf$voix, probs = 0.9, na.rm = TRUE) - quantile(vote_idf$voix, probs = 0.1, na.rm = TRUE)
+# écart interdéciles relatif
+quantile(vote_idf$voix, probs = 0.9, na.rm = TRUE) - quantile(vote_idf$voix, probs = 0.1, na.rm = TRUE)/median(vote_idf$voix, na.rm = TRUE)
+
+# Courbe de densité
+ggplot(vote_idf, aes(x=voix)) + 
+  geom_density()+
+# Ajouter la ligne de la moyenne
+  geom_vline(aes(xintercept=mean(voix, na.rm = TRUE)),
+            color="blue", linetype="dashed", size=1)+
+  #médiane
+    geom_vline(aes(xintercept=median(voix, na.rm = TRUE)),
+            color="red", linetype="dashed", size=1)+
+  # Habiller le graphique
+      ylab("Densité de probabilité")+
+  xlab("Part des voix pour MLP en 2017 (1er tour)")+
+  ggtitle("Distribution des votes par commune en IDF")
+
+
+# Boîte à moustache
+ggplot(vote_idf, aes(x = voix, y = as.character(dep)))+
+  geom_boxplot()
+
+
+```
+La médiane et la moyenne sont très proches, autour de 18,3% : on a donc une distribution symétrique. 
+L'étendue est de 43 points alors que l'écart interdéciles n'est que de 20 points: il y a donc quelques  individus extrêmes qui étirent la distribution: il faudra les considérer dans la discrétisation de notre variable et dans notre modèle. 
+
+La courbe de densité de probabilité montre une distribution presque gaussienne mais légèrement plus étirée à droite: nos individus extrêmes sont surtout des communes avec des scores très élevés. 
+
+Quand on décompose la distribution par département, on voit que les départements de première couronne ont des valeurs plus faibles que les autres et présentent une plus forte homogénéité spatiale: la variable est moins dispersée. Dans les autres départements, les médianes sont plus élevées et la dispersion plus forte: il y a une plus grande hétérogénéité spatiale. 
+
+Quelles conclusions de cette analyse? 
+- un début d'hypothèse: les départements proches de Paris votent moins pour MLP, un effet de la distance au centre ? 
+- avec une distribution symétrique et (presque) normale, la plupart des méthodes de discrétisation sont correctes, en revanche, il y a des individus extrêmes, on va donc utiliser la discrétisation dite "Q6" pour les isoler
+
+
+- Etudier le distribution spatiale par la cartographie: repérer les formes spatiales
+
+```{r dspa}
+
+mf_map(vote_idf,col = "grey90", border = "grey80")
+mf_map(vote_idf, 
+       var = "voix", 
+       type = "choro",
+       breaks = "q6",
+       pal= viridis(6),
+       leg_title = "Par des voix pour MLP\n(discrétisation Q6)",
+       add = T)
+mf_layout(title = "Le vote MLP en IDF (2017 - 1er tour)", 
+    credits = "Auteur: R. Leconte, 2021. Données: Ministère de l'intérieur, 2017",
+    arrow = FALSE)
+
+```
+La struture spatiale qui apparaît montre des auréoles concentriques autour de Paris, le vote augmentant à mesure que l'on s'éloigne. Il y a cependant une certaine dyssimétrie Est-Ouest: les valeurs les plus fortes sont à l'Est, alors que les plus faibles se concentrent à l'est. 
+
+- Formuler une hypothèse spatiale: 
+
+«Aujourd’hui, le vote Front national émerge précisément sur ces territoires de la France périphérique, avec des bastions qui sont toujours le Nord, l’Est, le pourtour méditerranéen, mais on voit bien, quand on zoome sur des régions et des départements, que la logique est exactement la même à chaque fois: c’est-à-dire que la dynamique FN part des petites villes, des zones rurales, des villes moyennes, et en tout cas à chaque fois des zones économiques les moins actives, qui créent le moins d’emplois. **Ce sont les territoires qui sont les plus éloignés des grandes métropoles, des grandes villes actives.**»
+
+Christophe Guilluy: «Le vote FN est devenu un vote de classe». Slate, 26 mars 2015. https://www.slate.fr/story/99531/christophe-guilluy-france-peripherique-vote-fn-departementales
+
+Le vote communal pour le FN augmente proportionnellement à la distance à Paris. 
+
+On a alors fait l'hypothèse d'une relation entre deux variables, on peut donc la tester avec les méthodes de la statistique bivariée. 
+
+# 4. Construire la variable spatiale explicative: la distance à Paris
+
+- Obtenir les centroïdes des communes 
+- Calculer la distance au centroïde de Paris
+
+
+```{r dist}
+
+# obtenir le centroïde des communes: en effet, on peut calculer des distances entre des points mais pas entre des aires, on approxime donc les coordonnées de la commune par son centre géométrique
+vote_idf$centro <- st_centroid(vote_idf)
+
+# pour calculer la distance à Paris, il faut isoler les coordonnées de Paris
+# Les données divisent Paris en 20 arrondissements 
+# option simple: on considère que le 1er ardt est le centre
+paris <- vote_idf %>% 
+  filter(insee == 75101)
+
+# option plus exacte, on regroupe les 20 arrondissements avant de calculer le centroïde
+paris <- vote_idf %>% 
+  filter(insee >= 75101 & insee <= 75120) %>% 
+  st_union() %>% 
+  st_centroid()
+  
+
+# calcul de la distance
+
+vote_idf$distance <- st_distance(vote_idf$centro, paris)
+
+# on passe la distance en km
+vote_idf$distance <- as.numeric(vote_idf$distance/1000)
+
+
+```
+
+
+
+# 5. Construire et valider le modèle
+
+- Calculer la droite de régression
+- Calculer le coefficient de détermination
+- Analyser la distribution des résidus
+
+```{r model}
+# calcul de la droite de régression
+reg <- lm(vote_idf$voix~ vote_idf$distance)
+
+# coefficients et R2
+summary(reg)
+
+# distribution des résidus
+plot(reg)
+
+```
+
+Modèle: VoteMLP = 7,8 + 0,26*dist
+
+Comment évaluer notre modèle? Il faut bien distinguer la qualité du modèle et sa validité statistique. 
+
+Pour évaluer sa qualité, on interprète le coefficient de détermination R². La qualité d'un modèle est subjective, elle dépend de la quantité d'erreur que l'analyste est prêt à accepter (sciences sociales != médecine)!.
+
+R² = 44%. Le modèle permet de prédire 44% de la variance de la part des voix obtenue par MLP. C'est à la fois peu, les résidus sont importants, et beaucoup pour une hypothèse si simpliste !
+
+Pour valider le modèle d'un point de vue statistique, il faut interpréter le graphique "residual vs fitted". 
+
+"fitted values" correspond aux valeurs estimées par le modèle:
+ - un résidu positif signifie que la valeur réelle est supérieure à la valeur estimée;
+ - un résidu négatif signifie que la valeur réelle est inférieure à la valeur estimée.
+
+Le niveau 0 représente la droite de régression, la ligne rouge la valeur moyenne des résidus: si les deux lignes sont proches, cela signifie que l'hypothèse de linéarité à la base du modèle est raisonnable: on a choisi le bon type de modèle. 
+
+Si, les points forment un rectangle ou un cigare autour de 0, cela signifie que les résidus sont dispersés de manière homogène, quelle que soit la valeur de X. L'hypothèse d'homoscedasticité (la variance des erreurs est la même partout) semble ici validée, on a choisi la bonne méthode avec les Moindre Carrés Ordinaires. 
+Quand la variance augmente ou diminue en fonction de X, les points formant un triangle, on parle d'hétéroscedasticité: il faut alors paramétrer différement le modèle (on peut utiliser la méthode des moindres carrés pondérés, par exemple en pondérant la distance avec la taille des communes).  
+
+Enfin, 3 outliers sont identifiés, dont les résidus s'écartent beaucoup du nuage de points. Ils sont peu nombreux pour une population de près de 1300 individus. 
+
+On peut donc valider notre modèle. 
+
+# 6. Analyser les résidus
+
+- Cartographier les résidus
+
+```{r residus}
+
+# stockage des résidus
+
+vote_mod <- vote_idf %>% 
+  filter(!(insee >= 75101 & insee <= 75120))
+
+vote_mod$residus<- reg$residuals
+
+# carthographie des résidus
+
+# on définis les breaks manuellement pour avoir une classe intermédiaire de résidus faibles
+bks <- c(min(vote_mod$residus), -10, -5, -1, 1, 5, 10, max(vote_mod$residus))
+
+mf_map(vote_idf,col = "grey90", border = "grey80")
+mf_map(vote_mod, 
+       var = "residus", 
+       type = "choro",
+       breaks = bks,
+       pal= cividis(7), # on utilise la palette cividis car c'est un double grandient de couleurs opposées permettant de distinguer les résidus positifs et négatifs
+       leg_title = "Résidus",
+       add = T)
+mf_layout(title = "Sur et sous-estimation du vote MLP en IDF (2017 - 1er tour)", 
+    credits = "Auteur: R. Leconte, 2021. Données: Ministère de l'intérieur, 2017",
+    arrow = FALSE)
+
+```
+La cartographie des résidus permet d'observer:
+- une surrestimation du vote MLP dans un secteur Sud-Ouest comprenant les communes des Yvelines et des Hauts-de-Seine et dans le secteur autour de Fontainebleau
+- une sousestimation du vote dans le tiers Nord-Est. 
+
+Deux conclusions peuvent être tirées de cela: 
+
+- on identifie visuellement de l'autocorrélation spatiale des résdius. Cela signifie que les communes proches ont tendance à se ressembler. Quand on observe ce type de résidus, on peut mettre en oeuvre un modèle de régression géographiquement pondérée. La régression géographiquement pondérée (RGP) cherche à prendre en compte les variations locales. Plusieurs modèles de régression locaux sont réalisés puis assemblés en un modèle global. Cette méthode est abordée dans le cours "R avancé". 
+
+- il est toujours possible d'améliorer, complexifier, raffiner un modèle statistique pour qu'il reproduise fidèlement la réalité. Un bon modèle n'est pas un modèle qui reproduit la réalité mais un modèle qui permet de l'expliquer! Il faut alors se poser la question des déterminants du vote d'un point de vue théorique: est-ce que l'espace peut vraiment expliquer le vote MLP ?
+
+Contrairement à Ch. Guilly, les spécialistes de géographie éléctorale mettent en avant les déterminants sociaux. 
+
+Pour Frédéric Sawicki, (Science politique, Université Paris 1), c'est davantage les positions sociales qui permettent d'expliquer le vote: 
+
+"Certains auront vite fait de voir dans ces résultats la fameuse coupure entre une France des villes, prospère et à l’avant-garde de la mondialisation heureuse, et la France abandonnée des périphéries, repaire des Français craintifs, résignés ou en colère. Mais cette façon de ramener le vote à l’expression d’émotions fait oublier que le vote n’est pas simplement une réaction ou un calcul, mais le fruit de la rencontre entre une offre politique et des dispositions sociales et culturelles liées à la position et à la trajectoire des individus.
+
+Autrement dit, le faible score obtenu par le FN dans les grandes villes est d’abord le fruit de l’inégale répartition territoriale des groupes sociaux et des classes d’âge. Dans les 20 plus grandes communes de France, la part des classes populaires dans la population – et plus particulièrement des ouvriers qui, selon l’IFOP, auraient voté à 39 % pour le Front national –, y est nettement plus faible. La part des chefs de ménage ouvriers y est en effet de 12,3 %, contre 16,7 % dans la France entière. Cet écart cache en outre un écart plus grand encore, impossible malheureusement à estimer précisément faute de données accessibles, en raison de la concentration plus forte des ouvriers immigrés dans les grands centres urbains, qui diminue d’autant le poids des ouvriers parmi les inscrits.
+
+Concernant l’âge, les moins de 30 ans y sont 6,5 points plus nombreux (43 %) qu’ailleurs, et les retraités y représentent seulement 20,6 %, contre 26,6 % dans la population totale. Or, le vote des retraités penche nettement à droite : les écarts d’espérance de vie entre groupes sociaux font que les personnes aisées sont surreprésentées dans cette catégorie, tout comme les agriculteurs, les professions indépendantes et les catholiques pratiquants.
+
+Le rejet du Front national et la propension à voter à gauche dans les grandes villes s’expliquent, enfin, par la part des emplois publics (l’administration publique, l’enseignement, la santé et l’action sociale y regroupe 37,6 % des emplois, contre 31,6 %) et des diplômés du supérieur (37,5 %, contre 26,8 %). A contrario, les non-salariés y sont moins nombreux (13,5 %, contre 16,1 %), de même que les propriétaires de leur résidence principale (36,3 %, contre 57 %). On l’oublie trop souvent, le revenu médian annuel par ménage y est inférieur de 1 300 euros par rapport au reste du pays, en lien avec la part plus importante de familles monoparentales. Derrière l’effet territoire se cache donc plutôt un effet de configuration lié à la combinaison singulière des groupes sociaux qui habitent les grandes villes, qu’ils l’aient choisi ou non."
+
+Source: "Le vote des grandes villes et ses clivages"", 28/04/2017, Alternatives économiques, https://www.alternatives-economiques.fr/vote-grandes-villes-clivages/00078538 
+
+Les géographes Bussi Michel, Fourquet Jérôme et Colange Céline défendent une thèse similaire: l'espace est le reflet des structures sociales.
+
+« Si le clivage gauche/droite continue d’être plus ou moins structuré sur la base de grandes régions, notamment à travers une différence est-ouest, la prise en compte du lieu de résidence et plus particulièrement de la distance à la grande agglomération la plus proche ou la moins éloignée apparaît aussi importante pour bien appréhender le vote. Au cours des trente dernières années, la géographie sociale de notre pays a été en effet profondément modifiée sous l’effet de l’étalement urbain et de la péri-urbanisation. Des pans entiers des catégories populaires ont progressivement quitté les grandes agglomérations pour s’installer dans les zones pavillonnaires du périurbain par un phénomène de relégation subie (la hausse de l’immobilier dans les métropoles les conduisant à s’installer ou à devenir propriétaire dans des zones plus abordables et donc toujours plus éloignées des centres) ou choisie (on fuit la grande ville, sa banlieue et ses nuisances supposées). Parallèlement à cela, les grandes villes ont vu s’accroître la population issue de l’immigration dans leurs quartiers populaires et se concentrer un nombre très important de cadres et professions intellectuelles. Dans ce nouveau paysage social, le « gradient d’urbanité » c’est-à-dire la distance qui sépare la commune de résidence de la grande agglomération (de plus de 200 000 habitants) la plus proche a une incidence électorale de plus en plus forte. C’est notamment le cas pour le Front national dont le vote est fortement structuré selon ce critère.»
+
+Source: « Analyse et compréhension du vote lors des élections présidentielles de 2012. L'apport de la géographie électorale », *Revue française de science politique*, 2012/5 (Vol. 62), p. 941-963. DOI : 10.3917/rfsp.625.941. URL : https://www.cairn.info/revue-francaise-de-science-politique-2012-5-page-941.htm 
+
+La composition sociale des communes apparaît alors devoir être prise en compte dans la modélisation du vote. Les modèles de régression multiple permettent d'intégrer plusieurs variables exlicatives. 
